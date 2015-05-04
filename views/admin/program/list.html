@@ -1,0 +1,28 @@
+<% include ../header.html %>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h4 class="page-header">节目管理&nbsp;>&nbsp;节目列表</h4>
+
+          <div class="row placeholders">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>节目名称</th>
+                  <th>节目介绍</th>
+                  <th style="text-align:right"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <% for(var i = 0; i < list.length; i++ ){ %>
+                    <tr>
+                      <td><img src="<%-list[i].logoUrl %>"></td>
+                      <td><%- list[i].name %></td>
+                      <td><%- list[i].description %></td>
+                      <td style="text-align:right"><a href="#" class="btn btn-default">节目详情</a></td>
+                    </tr>
+                <% } %>
+              </tbody>
+            </table>       
+          </div>
+        </div>   
+<% include ../footer.html %>

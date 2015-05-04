@@ -1,0 +1,35 @@
+<% include ../header.html %>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h1 class="page-header">房间管理&nbsp;>&nbsp;房间列表</h1>
+
+          <div class="row placeholders">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>房间名称</th>
+                  <th>房间类型</th>
+                  <th>房间状态</th>
+                  <th>当前分期</th>
+                  <th>所属节目</th>
+                  <th>创建时间</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% for(var i = 0; i < list.length; i++ ){ %>
+                    <tr>
+                      <td><%- list[i].name %></td>
+                      <td><%- list[i].type %></td>
+                      <td><%- list[i].state %></td>
+                      <td><%- list[i].playing %></td>
+                      <td><%- list[i].playing %></td>
+                      <td><%- list[i].created %></td>
+                    </tr>
+                <% } %>
+                <tr>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>       
+          </div>
+        </div>   
+<% include ../footer.html %>

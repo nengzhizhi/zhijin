@@ -1,0 +1,45 @@
+<% include ../header.html %>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h3 class="page-header">节目管理&nbsp;>&nbsp;创建节目</h3>
+          <% if(result.error){ %>
+            <div class="alert alert-danger" role="alert">
+              <strong><%- result.error %></strong>
+            </div>
+          <% } %>
+
+          <% if(result.success){ %>
+            <div class="alert alert-success" role="alert">
+              <strong><%- result.success %></strong>
+            </div>
+          <% } %>
+
+          <div class="row placeholders">
+            <form class="form-horizontal" action="http://localhost:3001/program/doCreate" method="post" enctype="multipart/form-data">
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">节目名称：</label>
+                    <div class="col-sm-4">
+                      <input name="name" class="form-control" id="name" type="text">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">节目LOGO：</label>
+                    <div class="col-sm-4">
+                      <input id="logo" name="logo" type="file" class="form-control" />     
+                    </div>
+                  </div>                  
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">节目简介：</label>
+                    <div class="col-sm-4">
+                    	<textarea class="form-control" rows="3" id="description" name="description"></textarea>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-4">
+                      <button type="submit" class="btn btn-default btn-primary">创建</button>
+                    </div>
+                  </div>
+                </form>            
+          </div>
+
+        </div>   
+<% include ../footer.html %>     
