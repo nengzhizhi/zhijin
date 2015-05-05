@@ -19,6 +19,11 @@ module.exports = function (options) {
 					app.get('/program/list', onProgramList);
 					app.post('/program/doCreate', onProgramDoCreate);
 					app.get('/episode/create', onEpisodeCreate);
+					app.get('/episode/list', onEpisodeList);
+					app.post('/episode/doCreate', onEpisodeDoCreate);
+					app.get('/episode/detail', onEpisodeDetail);
+					app.get('/episode/edit', onEpisodeEdit);
+
 				})
 			});	
 
@@ -91,13 +96,85 @@ module.exports = function (options) {
 
 	function onProgramList(req, res){
 		var programs = this.make$('program');
-		programs.list$({}, function(errors, programs){
+		programs.list$({}, function (err, programs){
 			res.render('admin/program/list', {list:programs});
 		});
 	}
 
 	function onEpisodeCreate(req, res){
-		res.render('admin/episode/create',{result:''});
+		var collection = this.make$('program');
+		collection.list$({}, function (err, results){
+			res.render('admin/episode/create',{result:'', programs:results});
+		});
+	}
+
+	function onEpisodeList(req, res){
+		var collection = this.make$('episode');
+		collection.list$({}, function (err, episodes){
+			res.render('admin/episode/list', {list:episodes});
+		});
+	}
+
+	function onEpisodeDetail(req, res){
+		if (!req.query.id) {
+			res.render('404');
+		}
+
+		var collection = this.make$('episode');
+		collection.list$({id:req.params.id}, function (err, episodes){
+			res.render('admin/episode/detail', {result:'', episode:episodes[0]});
+		});
+	}
+
+	function onEpisodeEdit(req, res){
+		if (!req.query.id) {
+			res.render('404');
+		}
+
+		var collection = this.make$('episode');
+		collection.list$({id:req.params.id}, function (err, episodes){
+			res.render('admin/episode/edit', {result:'', episode:episodes[0]});
+		});		
+	}
+
+	function onEpisodeDoCreate(req, res){
+		var seneca = this;
+		if (!req.body.name) {
+			res.render('admin/episode/create', {result:{'error':'分期名不能为空!'}});
+			return;			
+		}
+
+		if (!req.body.number) {
+			res.render('admin/episode/create', {result:{'error':'分期编号不能为空!'}});
+			return;			
+		}
+
+		if (!req.body.startTime) {
+			res.render('admin/episode/create', {result:{'error':'开始时间不能为空!'}});
+			return;			
+		}
+
+		if (!req.body.endTime) {
+			res.render('admin/episode/create', {result:{'error':'结束时间不能为空!'}});
+			return;			
+		}
+
+		var episode = seneca.make$('episode');
+		episode.name = req.body.name;
+		episode.number = req.body.number;
+		episode.program = req.body.program;
+		episode.startTime = req.body.startTime;
+		episode.endTime = req.body.endTime;
+		episode.save$(function (err, episode){
+			if (episode.id) {
+				var collection = seneca.make$('program');
+				collection.list$({}, function (errors, results){
+					res.render('admin/episode/create',{result:{'success':'创建成功！'}, programs:results});
+					return;
+				});						
+			}		
+		});
+		return;
 	}
 
 	return { name : 'backend' };

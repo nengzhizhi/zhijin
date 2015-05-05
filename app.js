@@ -1,4 +1,4 @@
-var seneca = require('seneca')();
+//var seneca = require('seneca')();
 
 /*
 seneca.use( 'mongo-store',
@@ -13,6 +13,7 @@ seneca.ready(function(){
 	});
 */
 
+/*
 seneca.use('./plugins/room/api');
 
 var app = require('express')();
@@ -20,3 +21,9 @@ var app = require('express')();
 app
 	.use(seneca.export('web'))
 	.listen(3001);
+
+*/
+
+var app = require('express')();
+app.use('/room', require('./controllers/roomRouter'));
+app.listen(3000);
