@@ -34,20 +34,27 @@
 	<div class="container-fluid">
       <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
-          <ul class="nav nav-sidebar">
-          	<li><h5 class="page-header">房间管理</h5></li>
-            <li><a href="/room/create">创建房间</a></li>
-            <li><a href="/room/list">房间列表</a></li>
-            <li><a href="#">Export</a></li>
-          </ul>
-          <ul class="nav nav-sidebar">
-          	<li><h5 class="page-header">节目管理</h5></li>
-            <li><a href="/program/create">创建节目</a></li>
-            <li><a href="/program/list">节目列表</a></li>
-          </ul>
-          <ul class="nav nav-sidebar">
-          	<li><h5 class="page-header">分期管理</h5></li>
-            <li><a href="/episode/create">创建分期</a></li>
-            <li><a href="/episode/list">分期列表</a></li>
-          </ul>
-        </div>   		
+          <div class="list-group">
+            <b class="list-group-item disabled">房间管理</b>
+            <a class="list-group-item" href="/room/create">创建房间</a>
+            <a class="list-group-item" href="/room/list">房间列表</a>
+          </div>
+          <div class="list-group">
+            <b class="list-group-item disabled">节目管理</b>
+            <a class="list-group-item" href="/program/create">创建节目</a>
+            <a class="list-group-item" href="/program/list">节目列表</a>
+          </div>
+          <div class="list-group">
+            <b class="list-group-item disabled">分期管理</b>
+            <a class="list-group-item" href="/episode/create">创建分期</a>
+            <a class="list-group-item" href="/episode/list">分期列表</a>
+          </div>
+          <div class="list-group">
+            <b class="list-group-item disabled">道具管理</b>
+            <a class="list-group-item" href="/prop/create">创建道具</a>
+          </div> 
+          <div class="list-group">
+            <b class="list-group-item disabled">互动管理</b>
+            <a class="list-group-item" href="/interaction/list">互动列表</a>
+          </div>                             
+        </div>  

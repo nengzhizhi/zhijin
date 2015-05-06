@@ -1,24 +1,22 @@
 <% include ../header.html %>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <h4 class="page-header">节目管理&nbsp;>&nbsp;节目列表</h4>
+          <h3 class="page-header">互动道具管理&nbsp;>&nbsp;互动列表</h3>
 
           <div class="row placeholders">
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th></th>
-                  <th>节目名称</th>
-                  <th>节目介绍</th>
-                  <th style="text-align:right"></th>
+                  <th>房间名称</th>
+                  <th>道具名称</th>
+                  <th>道具类型</th>
+                  <th>互动状态</th>
+                  <th>开启时间</th>
+                  <th>结束时间</th>
                 </tr>
               </thead>
               <tbody>
                 <% for(var i = 0; i < list.length; i++ ){ %>
                     <tr>
-                      <td></td>
-                      <td><%- list[i].name %></td>
-                      <td><%- list[i].description %></td>
-                      <td style="text-align:right"><a href="#" class="btn btn-default">节目详情</a></td>
                     </tr>
                 <% } %>
               </tbody>

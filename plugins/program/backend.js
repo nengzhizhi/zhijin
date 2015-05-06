@@ -1,15 +1,11 @@
 var fs = require('fs');
 var formidable = require('formidable');
 var bodyParser = require('body-parser');
+var async = require('async');
 
 module.exports = function (options) {
 	var seneca = this;
 	var router = this.export('web/httprouter');
-
-	this.use(
-			'mongo-store',
-			{name:'zj_program', host:'192.168.1.220', port: 27019}
-		);
 
 	this.act(
 			'role:web', 
@@ -23,6 +19,7 @@ module.exports = function (options) {
 					app.post('/episode/doCreate', onEpisodeDoCreate);
 					app.get('/episode/detail', onEpisodeDetail);
 					app.get('/episode/edit', onEpisodeEdit);
+					app.post('/episode/update', onEpisodeUpdate);
 
 				})
 			});	
@@ -115,25 +112,34 @@ module.exports = function (options) {
 		});
 	}
 
-	function onEpisodeDetail(req, res){
-		if (!req.query.id) {
-			res.render('404');
-		}
-
-		var collection = this.make$('episode');
-		collection.list$({id:req.params.id}, function (err, episodes){
-			res.render('admin/episode/detail', {result:'', episode:episodes[0]});
-		});
-	}
-
 	function onEpisodeEdit(req, res){
 		if (!req.query.id) {
 			res.render('404');
 		}
 
-		var collection = this.make$('episode');
-		collection.list$({id:req.params.id}, function (err, episodes){
-			res.render('admin/episode/edit', {result:'', episode:episodes[0]});
+		async.waterfall([
+				function (next) {
+					var prop = seneca.make$('prop');
+					prop.list$({}, function (err, props){
+						next(err,props);
+					});
+				}
+			], function (err, props){
+				var collection = seneca.make$('episode');
+				collection.load$({id:req.params.id}, function (err, episode){
+					res.render('admin/episode/edit', {result:'', 'episode':episode, 'props':props});
+				});
+			});
+	}
+
+	function onEpisodeDetail(req, res){
+		if (!req.query.id) {
+			res.render('404');
+		}
+
+		var collection = seneca.make$('episode');
+		collection.load$({id:req.params.id}, function (err, episode){
+			res.render('admin/episode/detail', {result:'', 'episode':episode});
 		});		
 	}
 
@@ -175,6 +181,27 @@ module.exports = function (options) {
 			}		
 		});
 		return;
+	}
+
+	function onEpisodeUpdate(req, res) {
+		var episode = seneca.make$('episode');
+
+		if ( req.body.id ){
+			episode.id = req.body.id;
+		} else {
+			res.render('admin/episode/edit',{result:{'error':'分期不存在！'}});
+			return;
+		}
+
+		if( req.body.prop ){
+			episode.props = req.body.prop;
+		}
+
+		episode.save$(function (err, episode) {
+			if (episode.id) {
+				res.render('admin/episode/edit',{result:{'success':'创建成功！'}});
+			}
+		});
 	}
 
 	return { name : 'backend' };

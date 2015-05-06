@@ -1,0 +1,85 @@
+<% include ../header.html %>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h3 class="page-header">道具管理&nbsp;>&nbsp;创建道具</h3>       
+          <% if(result.error){ %>
+            <div class="alert alert-danger" role="alert">
+              <strong><%- result.error %></strong>
+            </div>
+          <% } %>
+
+          <% if(result.success){ %>
+            <div class="alert alert-success" role="alert">
+              <strong><%- result.success %></strong>
+            </div>
+          <% } %>
+
+          <div class="row placeholders">
+            <form class="form-horizontal" action="/prop/doCreate" method="post" enctype="multipart/form-data">
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">道具名称：</label>
+                    <div class="col-sm-4">
+                      <input name="name" type="text" class="form-control">
+                    </div>
+                  </div>                 
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">道具图片（png）：</label>
+                    <div class="col-sm-4">
+                      <input name="img" type="file" class="form-control" />     
+                    </div>
+                  </div> 
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">道具类型：</label>
+                    <div class="col-sm-4">
+                      <select class="form-control" name="type">
+                        <option value="vote">投票</option>
+                        <option value="privilege">权限</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">投票阶段：</label>
+                    <div class="col-sm-2">
+                      <input name="number_1" class="form-control" placeholder="得票数">
+                    </div>
+                    <div class="col-sm-2">
+                      <input name="icon_1" type="file" class="form-control" />    
+                    </div>                    
+                  </div>                   
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label"></label>
+                    <div class="col-sm-2">
+                      <input name="number_2" class="form-control" placeholder="得票数">
+                    </div>
+                    <div class="col-sm-2">
+                      <input name="icon_2" type="file" class="form-control" />    
+                    </div>                    
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label"></label>
+                    <div class="col-sm-2">
+                      <input name="number_3" class="form-control" placeholder="得票数">
+                    </div>
+                    <div class="col-sm-2">
+                      <input name="icon_3" type="file" class="form-control" />    
+                    </div>                    
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label">持续时间：</label>
+                    <div class="col-sm-4">
+                      <input name="duration" class="form-control" placeholder="投票阶段持续时间">
+                    </div>                 
+                  </div> 
+
+                  <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-4">
+                      <button type="submit" class="btn btn-default btn-primary">创建道具</button>
+                    </div>
+                  </div>
+                </form>            
+          </div>
+        </div>   
+<% include ../footer.html %>
