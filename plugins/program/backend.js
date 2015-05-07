@@ -127,6 +127,12 @@ module.exports = function (options) {
 			], function (err, props){
 				var collection = seneca.make$('episode');
 				collection.load$({id:req.params.id}, function (err, episode){
+					props.forEach(function (prop){
+						if (episode.props && episode.props.indexOf(prop.id) >= 0){
+							prop.checked = true;
+						}
+					});
+
 					res.render('admin/episode/edit', {result:'', 'episode':episode, 'props':props});
 				});
 			});

@@ -1,0 +1,91 @@
+<% include ../header.html %>
+<style type="text/css">
+td{
+  text-align: left;
+}
+.prop th{
+  text-align: right;
+}
+</style>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h4 class="page-header">房间管理&nbsp;>&nbsp;房间列表&nbsp;>&nbsp;编辑房间详情</h4>
+          <div class="row placeholders" style="text-align:left">
+            <a href="/room/edit?id=<%-room.id %>" class="btn btn-success">保存</a>
+          </div>
+          <div class="row placeholders">
+            <table class="table table-striped">
+              <tbody>
+                <tr>
+                  <th class="col-sm-2">房间名称</th><td><%- room.name %></td>
+                </tr>
+                <tr>
+                  <th>房间类型</th><td><%- room.type %></td>
+                </tr>
+                <tr>
+                  <th>房间状态</th><td><%- room.status %></td>
+                </tr>
+
+                <tr>
+                  <th>分期信息</th>
+                  <td>
+                    <table class="table table-bordered prop">
+                      <tr>
+                        <th class="col-sm-2">所属节目</th><td></td>
+                      </tr>
+                      <tr>
+                        <th>分期名称</th><td></td>
+                      </tr>
+                      <tr>                        
+                        <th>分期编号</th><td></td>
+                      </tr>
+                      <tr>                        
+                        <th>互动道具</th><td></td>
+                      </tr>
+                      <tr>
+                        <th>本期演员</th><td></td>
+                      </tr>
+                      <tr>
+                        <th>操作：</th><td><a href="#" class="btn btn-primary">编辑分期</a></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <!--
+                <tr>
+                  <th>当前分期</th>
+                  <td>
+                    <div class="btn btn-default">第20150507期</div>
+                    <a href="#" class="btn btn-primary">选择直播分期</a>
+                  </td>
+                </tr>
+                <tr>
+                  <th>当前选手</th>
+                  <td>
+                    <div class="btn btn-default">张三</div>
+                    <div class="btn btn-default">李四</div>
+                    <a href="#" class="btn btn-primary">选择选手</a>                    
+                  </td>
+                </tr>
+                <tr>
+                  <th>互动道具</th>
+                  <td>
+                    <table class="table table-bordered prop">
+                      <tr>
+                        <th>道具名称</th><th>互动选手</th><th>道具状态</th><th>操作</th>
+                      </tr>
+                      <tr>
+                        <td>互动道具卡</td><td></td><td></td><td><a href="#" class="btn btn-success">开启</a></td>
+                      </tr>
+                      <tr>
+                        <td>再来一次卡</td><td></td><td></td><td><a href="#" class="btn btn-danger">关闭</a></td>
+                      </tr>                      
+
+                    </table>
+                  </td>
+                </tr>
+                -->                      
+              </tbody>
+            </table>       
+          </div>
+        </div>   
+<% include ../footer.html %>

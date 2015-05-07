@@ -14,7 +14,11 @@ module.exports = function (options) {
 
 
 	function onCreateProp(req, res) {
-		res.render('admin/prop/create', {result:''});
+		var collection = seneca.make$('program');
+
+		collection.list$({}, function (err, programs){
+			res.render('admin/prop/create', { result:'', 'programs':programs});
+		});
 	}
 
 	function onDoCreateProp(req, res){
@@ -37,6 +41,7 @@ module.exports = function (options) {
 			var prop = seneca.make$('prop');
 			prop.name = fields.name;
 			prop.imgUrl = imgUrl;
+			prop.program = fields.program;
 			prop.type = fields.type;
 			prop.voteStage = [];
 			if(files.icon_1.size && fields.number_1){
