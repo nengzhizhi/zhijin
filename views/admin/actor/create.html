@@ -16,16 +16,11 @@
           <div class="row placeholders" class="form-horizontal">
             <form class="form-horizontal" action="/actor/doCreate" method="post">
               <%- form %>
+              <%- actorImg %>
               <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-4">
                   <button type="submit" class="btn btn-primary">创建选手</button>
                 </div>
-              </div>
-              <div class="form-group">
-                <label for="id_name" class="control-label col-sm-2">选手图片：</label>
-                <div class="col-sm-4"><input id="img" name="img" type="file" class="form-control"></div>
-                <button class="btn btn-success" onClick="upload('img','imgUrl')" style="float:left">上传</button>
-                <input type="hidden" id="imgUrl">
               </div>
             </form>
           </div>

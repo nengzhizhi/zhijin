@@ -12,7 +12,7 @@ seneca.use('/plugins/room/backend');
 seneca.use('/plugins/program/backend');
 seneca.use('/plugins/prop/backend');
 seneca.use('/plugins/actor/backend');
-seneca.use('/plugins/common/backend')
+seneca.use('/plugins/common')
 
 var adminApp = require('express')();
 //adminApp.set('view engine', 'ejs'); 

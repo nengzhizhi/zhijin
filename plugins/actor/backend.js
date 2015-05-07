@@ -2,6 +2,8 @@ var forms = require('forms');
 var fields = forms.fields;
 var validators = forms.validators;
 var widgets = forms.widgets;
+var common = require('../common/index.js');
+var async = require('async');
 
 module.exports = function (options) {
 	var seneca = this;
@@ -25,42 +27,89 @@ module.exports = function (options) {
 				})
 			});
 
+	seneca.use('/plugins/actor/service');
+
 	seneca.act('role:web', {use:router(function (app){
 		app.get('/actor/create', onCreate);
 		app.post('/actor/doCreate', onDoCreate);
 	})});
 
 	function onCreate(req, res){
-		res.render('admin/actor/create', { result:'', form:seneca.createForm.toHTML(bootstrapField) });
+		res.render(
+					'admin/actor/create', 
+					{ 
+						result:'', 
+						form:seneca.createForm.toHTML(common.bootstrapField), 
+						actorImg:common.toImageHTML('选手图片：', 'img') 
+					}
+				);
 	}
 
 	function onDoCreate(req, res){
+		async.waterfall([
+			function (next){
+				seneca.createForm.handle(req,{
+					success: function (form){
+						next(null, form.data);
+					},
+					other: function (form){
+						//FIXME
+						next(null, form.data);
+					}
+				});
+		}, function (data, next){
+			seneca.act({role:'actor',cmd:'create',data:'data'}, function (err, result){
+				next(err, result);
+			});
+		}], function (err, result){
+			if (err) {
+				res.render(
+					'admin/actor/create', 
+					{ 
+						result:{error:err}, 
+						form:seneca.createForm.toHTML(common.bootstrapField), 
+						actorImg:common.toImageHTML('选手图片：', 'img') 
+					}
+				);				
+			} else {
+				res.render(
+					'admin/actor/create', 
+					{ 
+						result:{'success':'上传成功！'}, 
+						form:seneca.createForm.toHTML(common.bootstrapField), 
+						actorImg:common.toImageHTML('选手图片：', 'img') 
+					}
+				);				
+			}
+		});
+
+		/*
 		seneca.createForm.handle(req, {
 			success: function (form) {
-				console.log('form.data:' + form.data);
-				res.render('admin/actor/create', {result:{success:'创建成功！'}});
+
+				seneca.act({role:'actor',cmd:'create',data:form.body}, function);
+
+				res.render(
+					'admin/actor/create', 
+					{ 
+						result:{'success':'上传成功！'}, 
+						form:seneca.createForm.toHTML(bootstrapField), 
+						actorImg:common.toImageHTML('选手图片：', 'img') 
+					}
+				);
 			},
 			other : function (form){
 				console.log('form.data:' + form.data);
-				res.render('admin/actor/create', { result:'', 'form':form.toHTML(bootstrapField) });
+				res.render(
+					'admin/actor/create', 
+					{ 
+						result:'', 
+						form:seneca.createForm.toHTML(bootstrapField), 
+						actorImg:common.toImageHTML('选手图片：', 'img') 
+					}
+				);
 			}
 		});
-	}
-
-
-	var bootstrapField = function (name, object) {
-		object.widget.classes = object.widget.classes || [];
-		if(object.widget.classes.indexOf('form-control') < 0){
-			object.widget.classes.push('form-control');
-		}
-
-		var label = object.labelHTML(name);
-		var error = object.error ? '<label class="control-label" style="text-align:left">' + object.error + '</label>' : '';
-
-		var validationclass = object.value && !object.error ? 'has-success' : '';
-			validationclass = object.error ? 'has-error' : validationclass;
-
-		var widget = object.widget.toHTML(name, object);
-		return '<div class="form-group ' + validationclass + '">' + label + '<div class="col-sm-4">' + widget + '</div>' + error + '</div>';	
+		*/
 	}
 }
