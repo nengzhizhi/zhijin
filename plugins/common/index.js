@@ -58,9 +58,12 @@ function toImageHTML(labelText, id) {
 
 function bootstrapField(name, object) {
 	object.widget.classes = object.widget.classes || [];
-	if(object.widget.classes.indexOf('form-control') < 0){
+	object.cssClasses = object.cssClasses || {label: ['control-label','col-sm-2']};
+	if(object.widget.classes.indexOf('form-control') < 0 && object.widget.type != 'multipleCheckbox'){
 		object.widget.classes.push('form-control');
 	}
+
+
 
 	var label = object.labelHTML(name);
 	var error = object.error ? '<label class="control-label" style="text-align:left">' + object.error + '</label>' : '';
@@ -69,7 +72,18 @@ function bootstrapField(name, object) {
 		validationclass = object.error ? 'has-error' : validationclass;
 
 	var widget = object.widget.toHTML(name, object);
-	return '<div class="form-group ' + validationclass + '">' + label + '<div class="col-sm-4">' + widget + '</div>' + error + '</div>';	
+
+	if(object.widget.type == 'multipleCheckbox'){
+		var html = 
+				'<div class="form-group ' + validationclass + '">' + label + 
+				'<div class="col-sm-6"><a href="#' + name + '" class="btn btn-primary" data-toggle="collapse" aria-expanded="false" aria-controls="' + name + '">选择</a>' +
+				'<div class="collapse" id="' + name + '" aria-expanded="false"><div class="well">' +
+				widget +
+				'</div></div></div></div>';
+		return html;
+	} else {
+		return '<div class="form-group ' + validationclass + '">' + label + '<div class="col-sm-4">' + widget + '</div>' + error + '</div>';	
+	}
 }
 
 module.exports.toImageHTML = toImageHTML;

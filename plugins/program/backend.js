@@ -16,7 +16,7 @@ module.exports = function (options) {
 	var seneca = this;
 	var router = this.export('web/httprouter');
 
-	//seneca.use('/plugin/prop/service');
+	seneca.use('/plugins/prop/service');
 
 	seneca.act(
 			'role:web', 
@@ -124,38 +124,66 @@ module.exports = function (options) {
 	}
 
 	function onEpisodeEdit(req, res){
+		var episode = {};
+		var props = {};
+		var selectProps = [];
+
 		async.waterfall([
 			function (next){
-				seneca.act({role:'program',cmd:'getEpisode',data:{program:req.query.id}}, function (err, props){
-					next(err, props);
+				seneca.act({role:'program',cmd:'getEpisode',data:{program:req.query.id}}, function (err, result){
+					episode = result;
+					next(err, null);
+				});
+			},
+			function (result, next) {
+				seneca.act({role:'prop', cmd:'list',data:{program:req.query.id}}, function (err, document){
+					for (var i = 0; i < document.length; i++) {
+						props[document[i].name] = document[i].id;
+						if ( episode.props && episode.props.indexOf(document[i].id) >=0 ){
+							selectProps.push(document[i].id);
+						}
+					}
+					next(err, null);
 				});
 			}
 		], function (err, result){
 			seneca.editForm = forms.create({
 				'name': fields.string({
 					required: validators.required('请输入分期名称！'),
-					cssClasses: {label: ['control-label','col-sm-2']},
 					label: '分期名称：',
-					value: result.name
+					value: episode.name
 				}),
 				'number': fields.number({
 					required: validators.required('请输入分期编号！'),
-					cssClasses: {label: ['control-label','col-sm-2']},
 					label: '分期编号：',
-					value: result.number
+					value: episode.number
 				}),
 				'startTime': fields.date({
 					required: validators.required('请输入分期开始时间！'),
-					cssClasses: {label: ['control-label','col-sm-2']},
 					label: '开始时间：',
-					value: result.startTime
+					value: episode.startTime
 				}),
 				'endTime': fields.date({
 					required: validators.required('请输入分期结束时间！'),
-					cssClasses: {label: ['control-label','col-sm-2']},
 					label: '结束时间：',
-					value: result.endTime
-				})						
+					value: episode.endTime
+				}),
+				'actors': fields.string({
+					choices: {one: 'Item one', two: 'Item two', three: 'Item three'},
+					widget: widgets.multipleCheckbox(),
+					label: '本期选手：'
+				}),
+				'props': fields.string({
+					choices: props,
+					value: selectProps, 
+					widget: widgets.multipleCheckbox(),
+					label: '本期道具：'
+				}),
+				'gifts': fields.string({
+					choices: {one: 'Item one', two: 'Item two', three: 'Item three'},
+					widget: widgets.multipleCheckbox(),
+					label: '本期礼物：'
+				}),											
 			});
 
 			res.render(
