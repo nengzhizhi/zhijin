@@ -16,13 +16,16 @@
           <div class="row placeholders" class="form-horizontal">
             <form class="form-horizontal" action="/actor/doCreate" method="post">
               <%- form %>
-              <%- actorImg %>
               <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-4">
                   <button type="submit" class="btn btn-primary">创建选手</button>
                 </div>
               </div>
             </form>
+            <!--不能放在form中上传-->
+            <div class="form-horizontal">
+              <%- actorImg %>
+            </div>
           </div>
         </div>
 
@@ -42,8 +45,8 @@ function upload(id, url){
           processData: false,
           complete: function(data){
             if(data.status==200){
-              //alert(data.responseText);
-              $('#'+url).attr('src',data.responseText);
+              alert("上传成功！");
+              $('#'+url).attr('src', data.responseText);
             }
             else{
               alert("文件上传失败2！");

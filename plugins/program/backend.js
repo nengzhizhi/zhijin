@@ -1,13 +1,24 @@
+/*
 var fs = require('fs');
 var formidable = require('formidable');
 var bodyParser = require('body-parser');
 var async = require('async');
+*/
+
+var forms = require('forms');
+var async = require('async');
+var fields = forms.fields;
+var validators = forms.validators;
+var widgets = forms.widgets;
+var common = require('../common/index.js');
 
 module.exports = function (options) {
 	var seneca = this;
 	var router = this.export('web/httprouter');
 
-	this.act(
+	//seneca.use('/plugin/prop/service');
+
+	seneca.act(
 			'role:web', 
 			{
 				use:router(function (app){
@@ -113,29 +124,48 @@ module.exports = function (options) {
 	}
 
 	function onEpisodeEdit(req, res){
-		if (!req.query.id) {
-			res.render('404');
-		}
-
 		async.waterfall([
-				function (next) {
-					var prop = seneca.make$('prop');
-					prop.list$({}, function (err, props){
-						next(err,props);
-					});
-				}
-			], function (err, props){
-				var collection = seneca.make$('episode');
-				collection.load$({id:req.params.id}, function (err, episode){
-					props.forEach(function (prop){
-						if (episode.props && episode.props.indexOf(prop.id) >= 0){
-							prop.checked = true;
-						}
-					});
-
-					res.render('admin/episode/edit', {result:'', 'episode':episode, 'props':props});
+			function (next){
+				seneca.act({role:'program',cmd:'getEpisode',data:{program:req.query.id}}, function (err, props){
+					next(err, props);
 				});
+			}
+		], function (err, result){
+			seneca.editForm = forms.create({
+				'name': fields.string({
+					required: validators.required('请输入分期名称！'),
+					cssClasses: {label: ['control-label','col-sm-2']},
+					label: '分期名称：',
+					value: result.name
+				}),
+				'number': fields.number({
+					required: validators.required('请输入分期编号！'),
+					cssClasses: {label: ['control-label','col-sm-2']},
+					label: '分期编号：',
+					value: result.number
+				}),
+				'startTime': fields.date({
+					required: validators.required('请输入分期开始时间！'),
+					cssClasses: {label: ['control-label','col-sm-2']},
+					label: '开始时间：',
+					value: result.startTime
+				}),
+				'endTime': fields.date({
+					required: validators.required('请输入分期结束时间！'),
+					cssClasses: {label: ['control-label','col-sm-2']},
+					label: '结束时间：',
+					value: result.endTime
+				})						
 			});
+
+			res.render(
+				'admin/episode/edit', 
+				{
+					result : '', 
+					editForm : seneca.editForm.toHTML(common.bootstrapField)
+				}
+			);
+		});
 	}
 
 	function onEpisodeDetail(req, res){

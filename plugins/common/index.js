@@ -16,7 +16,6 @@ module.exports = function (options) {
 		form.parse(req, function (err, fields, files){
 			for (var key in files) {
 				var file = files[key];
-				console.log(file);
 				var fileName = (new Date()).getTime();
 
 				switch (file.type) {
@@ -32,18 +31,16 @@ module.exports = function (options) {
 				}
 				var uploadDir = 'public/upload/' + fileName;
 				fs.rename(file.path, uploadDir, function (err){
-					console.log('err:' + err);
 					if (err) {
-						res.write({'err' : err});
+						res.write(JSON.stringify({'err' : err}));
 						res.end();						
 					}
-					res.write({imgUrl:uploadDir});
+					res.write(uploadDir);
 					res.end();
 				});
 			}
 		});
 	}
-
 }
 
 function toImageHTML(labelText, id) {
@@ -53,7 +50,7 @@ function toImageHTML(labelText, id) {
 		'<div class="col-sm-4">' +
 		'<input id="' + id + '" type="file" class="form-control">' +
 		'</div>' +
-		'<button class="btn btn-success" onClick="upload(\'' + id + '\' , \'' + id + 'Url\')" style="float:left">上传</button>' +
+		'<button class="btn btn-default" onClick="upload(\'' + id + '\' , \'' + id + 'Url\')" style="float:left">上传</button>' +
 		'<input type="hidden" id="' + id + 'Url">' +
 	'</div>';
 	return html;
