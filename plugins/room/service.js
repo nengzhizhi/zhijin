@@ -5,33 +5,36 @@
  */
 
 module.exports = function (options) {
-	this.use(
-				'mongo-store',
-				{
-					name : 'zj-room',
-					host : '192.168.1.220',
-					port : 27019
-				}
-			);
+	var seneca = this;
 
 	this.add({role:'room',cmd:'get'}, cmd_get);
+	this.add({role:'room',cmd:'list'}, cmd_list);
+	this.add({role:'room',cmd:'save'}, cmd_save);
 
 	function cmd_get(args, callback){
-		var collection = this.make$('room');
+		var collection = seneca.make$('room');
+		
+		collection.load$(args.data, function (err, room) {
+			callback(err, room);
+		});
+	}
 
-		if (!args.id) {
-			throw new Error("id null!");
-			return;
-		}
+	function cmd_list(args, callback){
+		var collection = seneca.make$('room');
 
-		collection.load$({id:args.id}, function (err, room) {
-			if (room) {
-				callback(err, room);
-			} else {
-				callback('invalid room id!',null);
-			}
+		collection.list$({}, function (err, rooms) {
+			callback(err, rooms);
 		});		
 	}
 
-	return { name : 'service'}
+	function cmd_save(args, callback){
+		var room = seneca.make$('room');
+		room.name = args.data.name;
+		room.type = args.data.type;
+		room.save$(function (err, room){
+			callback(err, room);
+		});
+	}
+
+	return { name : 'service' };
 }

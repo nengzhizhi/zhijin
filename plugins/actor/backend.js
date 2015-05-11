@@ -33,14 +33,15 @@ module.exports = function (options) {
 				'name': fields.string({
 					required: validators.required('请输入选手姓名！'),
 					errorAfterField: true,
-					cssClasses: {label: ['control-label','col-sm-2']},
 					label: '选手姓名：'
 				}),
 				'program': fields.string({
 					choices: programs,
 					widget: widgets.select(),
-					cssClasses: {label: ['control-label','col-sm-2']},
 					label: '所属节目：'
+				}),
+				'avatar': fields.string({
+					widget: widgets.hidden()
 				})
 			});
 
@@ -60,27 +61,36 @@ module.exports = function (options) {
 			function (next){
 				seneca.createForm.handle(req,{
 					success: function (form){
-						next(null, form.data);
+						next(null, form);
 					},
 					other: function (form){
 						//FIXME
-						next(null, form.data);
+						next("Invalid input", form);
 					}
 				});
-		}, function (data, next){
-			seneca.act({role:'actor',cmd:'create',data:data}, function (err, result){
+		}, function (form, next){
+			seneca.act({role:'actor', cmd:'create', data:form.data}, function (err, result){
 				next(err, result);
 			});
 		}], function (err, result){
-			if (err) {
+			if ( err == "Invalid input") {
 				res.render(
 					'admin/actor/create', 
 					{ 
-						result:{error:err}, 
-						form:seneca.createForm.toHTML(common.bootstrapField), 
+						result:{ error:err }, 
+						form:result.toHTML(common.bootstrapField), 
 						actorImg:common.toImageHTML('选手图片：', 'img') 
 					}
 				);				
+			} else if (err) {
+				res.render(
+					'admin/actor/create', 
+					{ 
+						result:{ error:err }, 
+						form:seneca.createForm.toHTML(common.bootstrapField), 
+						actorImg:common.toImageHTML('选手图片：', 'img') 
+					}
+				);							
 			} else {
 				res.render(
 					'admin/actor/create', 
@@ -96,7 +106,7 @@ module.exports = function (options) {
 
 	function onList(req, res){
 		async.waterfall([function (next){
-			seneca.act({role:'actor',cmd:'list',data: {}}, function (err, result){
+			seneca.act({role:'actor', cmd:'list', data: {}}, function (err, result){
 					next(err, result);
 				});
 		}], function (err, result){

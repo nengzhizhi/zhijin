@@ -1,4 +1,6 @@
 <% include ../header.html %>
+  <link rel="stylesheet" href="/css/fileUpload/style.css">
+  <link rel="stylesheet" href="/css/fileUpload/jquery.fileupload.css">
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           <h4 class="page-header">选手管理&nbsp;>&nbsp;创建选手</h4>       
           <% if(result.error){ %>
@@ -17,44 +19,55 @@
             <form class="form-horizontal" action="/actor/doCreate" method="post">
               <%- form %>
               <div class="form-group">
+                <label for="id_name" class="control-label col-sm-2">选手图片：</label>
+                <div class="col-sm-4">
+                  <span class="btn btn-success form-control fileinput-button">
+                      <i class="glyphicon glyphicon-plus"></i>
+                      <span>选择文件..</span>
+                      <!-- The file input field used as target for the file upload widget -->
+                      <input id="fileupload" type="file" name="files[]" multiple>
+                  </span>              
+                </div>              
+              </div>
+              <div class="form-group">
+                <label for="id_name" class="control-label col-sm-2"></label>
+                <div class="col-sm-4">
+                  <div id="progress" class="progress">
+                      <div class="progress-bar progress-bar-success progress-bar-striped"></div>
+                  </div>
+                  <div id="files" class="files"></div>                
+                </div>
+              </div>
+              <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-4">
-                  <button type="submit" class="btn btn-primary">创建选手</button>
+                  <button type="submit" class="btn btn-primary form-control">创建选手</button>
                 </div>
               </div>
             </form>
-            <!--不能放在form中上传-->
-            <div class="form-horizontal">
-              <%- actorImg %>
-            </div>
           </div>
         </div>
 
 <% include ../footer.html %>
+<script src="/js/fileUpload/vendor/jquery.ui.widget.js"></script>
+<script src="/js/fileUpload/jquery.iframe-transport.js"></script>
+<script src="/js/fileUpload/jquery.fileupload.js"></script>
 <script type="text/javascript">
-function upload(id, url){
-  var data = new FormData()
-  var files = $('#'+id)[0].files;
-  if (files) {
-    data.append("file", files[0]);
-    $.ajax({
-          type: 'post',
-          dataType: 'json',
-          url: '/common/upload',
-          data: data,
-          contentType: false,
-          processData: false,
-          complete: function(data){
-            if(data.status==200){
-              alert("上传成功！");
-              $('#'+url).attr('src', data.responseText);
-            }
-            else{
-              alert("文件上传失败2！");
-            }
-          }
-        })    
-  } else {
-    alert("文件上传失败1！");
+var uploadUrl = "http://localhost:8888/files/";
+$('#fileupload').fileupload({
+  url: uploadUrl,
+  dataType: 'json',
+  done: function (e, data) {
+    $.each(data.result.files, function (index, file) {
+      $('<p/>').text(file.name).appendTo('#files');
+    });
+  },
+  progressall: function (e, data) {
+  var progress = parseInt(data.loaded / data.total * 100, 10);
+    $('#progress .progress-bar').css(
+      'width',
+      progress + '%'
+    );
   }
-}
+}).prop('disabled', !$.support.fileInput)
+    .parent().addClass($.support.fileInput ? undefined : 'disabled');
 </script>

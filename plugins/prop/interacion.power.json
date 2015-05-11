@@ -1,0 +1,43 @@
+{
+	"name" : "xxxx",
+	"type" : "power",
+	"prop" : {},
+	"roomId" : "xxxxxxxx-xxxxxxx",
+	"status" : true,
+	"countdown" : {
+		"buy" : 5,
+		"endBuy" : 5,
+		"use" : 5,
+		"endUse" : 5
+	},
+	"actors" : [
+		{
+			"name" : "xxxx",
+			"avatar" : "xxxxx"
+		}
+	],
+	"menu" : {
+		"options" : [
+			{
+				"name" : "xxxxx",
+				"icon" : "http://xxxx.png"
+			}
+		]
+	},
+	"result" : {
+		"buyResult" : {
+			"winner" : "xxxx",
+			"consumption" : 123
+		},
+		"useResult" : {
+			"actor" : {
+				"name" : "xxxx",
+				"avatar" : "http://xxxx.png"
+			},
+			"option" : {
+				"name" : "xxxx",
+				"icon" : "http://xxxxx.png"
+			}
+		}
+	}
+}

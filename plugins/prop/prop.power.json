@@ -1,0 +1,18 @@
+{
+	"name" : "变装卡",
+	"type" : "power",
+	"countdown" : {
+		"buy" : 5,
+		"endBuy" : 5,
+		"use" : 5,
+		"endUse" : 5		
+	},
+	"menu" : {
+		"options" : [
+			{
+				"name" : "xxxxx",
+				"icon" : "http://xxxx.png"
+			}
+		]		
+	}
+}

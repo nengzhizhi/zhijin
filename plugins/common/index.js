@@ -5,6 +5,7 @@ module.exports = function (options) {
 	var seneca = this;
 	var router = this.export('web/httprouter');
 
+	//图片上传公共接口，返回图片地址
 	seneca.act('role:web', {use:router(function (app){
 		app.post('/common/upload', onUpload);
 	})});
@@ -14,7 +15,11 @@ module.exports = function (options) {
 		form.uploadDir = 'public/upload/temp/';
 
 		form.parse(req, function (err, fields, files){
+			console.log(fields);
+			console.log(JSON.stringify(files));
 			for (var key in files) {
+				console.log(key);
+				console.log(files[key]);
 				var file = files[key];
 				var fileName = (new Date()).getTime();
 
@@ -50,7 +55,7 @@ function toImageHTML(labelText, id) {
 		'<div class="col-sm-4">' +
 		'<input id="' + id + '" type="file" class="form-control">' +
 		'</div>' +
-		'<button class="btn btn-default" onClick="upload(\'' + id + '\' , \'' + id + 'Url\')" style="float:left">上传</button>' +
+		'<a href="#" class="btn btn-default" onClick="upload(\'' + id + '\' , \'' + id + 'Url\')" style="float:left">上传</a>' +
 		'<input type="hidden" id="' + id + 'Url">' +
 	'</div>';
 	return html;
@@ -63,13 +68,11 @@ function bootstrapField(name, object) {
 		object.widget.classes.push('form-control');
 	}
 
-
-
 	var label = object.labelHTML(name);
-	var error = object.error ? '<label class="control-label" style="text-align:left">' + object.error + '</label>' : '';
+	var error = object.error ? '<label class="control-label" style="float:left">' + object.error + '</label>' : '';
 
-	var validationclass = object.value && !object.error ? 'has-success' : '';
-		validationclass = object.error ? 'has-error' : validationclass;
+	var validationclass = '';
+	validationclass = object.error ? 'has-error' : validationclass;
 
 	var widget = object.widget.toHTML(name, object);
 

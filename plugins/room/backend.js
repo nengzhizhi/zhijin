@@ -1,8 +1,19 @@
+var forms = require('forms');
+var async = require('async');
+var fields = forms.fields;
+var validators = forms.validators;
+var widgets = forms.widgets;
+var common = require('../common/index.js');
+
 
 module.exports = function (options) {
 	var seneca = this;
 	var router = this.export('web/httprouter');
-	this.act(
+
+
+	seneca.use('/plugins/room/service');
+
+	seneca.act(
 			'role:web', 
 			{
 				use:router(function (app){
@@ -14,48 +25,128 @@ module.exports = function (options) {
 				})
 			});
 
+	seneca.createForm = forms.create({
+		name: fields.string({
+			required: validators.required('请输入房间名称'),
+			errorAfterField: true,
+			label: '房间名称：'
+		}),
+		type: fields.string({
+			label: '房间类型：',
+			widget: widgets.select(),
+			choices: {
+				individual: '个人房间',
+				offical : '官方房间'
+			}
+		})
+	});
+
 	function onCreate(req, res) {
-		res.render('admin/room/create', {result:''});
+		res.render(
+			'admin/room/create', 
+			{
+				result:'',
+				createForm:seneca.createForm.toHTML(common.bootstrapField)
+			}
+		);
 	}
 
 	function onDoCreate(req, res) {
-		if (!req.body.name) {
-			res.render('admin/room/create', {result:{'error':'房间名不能为空！'}});
-		}
-
-		var room = seneca.make$('room');
-		room.name = req.body.name;
-		room.type = req.body.type;
-		room.save$(function (err, room){
-			if (room.id) {
-				res.render('admin/room/create', {result:{'success':'创建成功！'}});
-			}
-		});
-
+		async.waterfall([
+				function (next) {
+					seneca.createForm.handle(req, {
+						success : function (form){
+							next(null, form);
+						},
+						other : function (form){
+							next("Invalid input", form);
+						}
+					});
+				}, function (form, next) {
+					seneca.act({role:'room',cmd:'save','data':form.data}, function (err, result){
+						next(err, result);
+					});					
+				}
+			], function (err, result){
+				if (err == "Invalid input") {
+					res.render(
+						'admin/room/create',
+						{
+							result:{ error : err },
+							createForm:result.toHTML(common.bootstrapField)
+						}
+					);
+				} else if(err) {
+					res.render(
+						'admin/room/create',
+						{
+							result:{ error : err },
+							createForm:seneca.createForm.toHTML(common.bootstrapField)
+						}
+					);
+				} else {
+					res.render(
+						'admin/room/create',
+						{
+							result:{'success':'创建成功！'},
+							createForm:seneca.createForm.toHTML(common.bootstrapField)
+						}
+					);					
+				}
+			});
 	}
 
 	function onList(req, res) {
-		var rooms = seneca.make$('room');
-		rooms.list$({}, function (error, rooms){
-			res.render('admin/room/list', {list:rooms});
+		async.series({
+			rooms : function (next) {
+				seneca.act({role:'room',cmd:'list',data:{}}, function (err, rooms){
+					next(err, rooms);
+				})
+			}
+		}, function (err, result){
+			res.render('admin/room/list', { list : result.rooms });
 		});
 	}
 
 	function onEdit(req, res) {
-		var id = req.query.id;
+		async.series({
+			room : function (next) {
+				seneca.act({role:'room',cmd:'get',data:{id:req.query.id}}, function (err, room){
+					next(err, room);
+				});
+			}
+		}, function (err, result){
+			seneca.editForm = forms.create({
+				name: fields.string({
+					required: validators.required('请输入房间名称'),
+					errorAfterField: true,
+					label: '房间名称：',
+					value: result.room.name
+				}),
+				type: fields.string({
+					label: '房间类型：',
+					widget: widgets.select(),
+					choices: {
+						individual: '个人房间',
+						offical : '官方房间'
+					},
+					value: result.room.type
+				})
+			});
 
-		var collection = seneca.make$('room');
-		collection.load$({id:req.query.id}, function (err, room){
-			res.render('admin/room/edit', {'room':room});
+			res.render('admin/room/edit', { editForm:seneca.editForm.toHTML(common.bootstrapField) });
 		});
 	}
 
 	function onDetail(req, res){
-		var id = req.query.id;
-
-		var collection = seneca.make$('room');
-		collection.load$({id:req.query.id}, function (err, room){
-			res.render('admin/room/detail', {'room':room});
+		async.series({
+			room : function (next) {
+				seneca.act({role:'room',cmd:'get',data:{id:req.query.id}}, function (err, room){
+					next(err, room);
+				});
+			}
+		}, function (err, result){
+			res.render('admin/room/detail', { 'room':result.room });
 		});
 	}
 

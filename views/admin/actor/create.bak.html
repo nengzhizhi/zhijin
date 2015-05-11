@@ -1,0 +1,82 @@
+<% include ../header.html %>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h4 class="page-header">选手管理&nbsp;>&nbsp;创建选手</h4>       
+          <% if(result.error){ %>
+            <div class="alert alert-danger" role="alert">
+              <strong><%- result.error %></strong>
+            </div>
+          <% } %>
+
+          <% if(result.success){ %>
+            <div class="alert alert-success" role="alert">
+              <strong><%- result.success %></strong>
+            </div>
+          <% } %>
+
+          <div class="row placeholders" class="form-horizontal">
+            <form class="form-horizontal" action="/actor/doCreate" method="post">
+              <%- form %>
+              <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-4">
+                  <button type="submit" class="btn btn-primary">创建选手</button>
+                </div>
+              </div>
+            <div class="form-horizontal">
+              <%- actorImg %>
+            </div>              
+            </form>
+            <!--不能放在form中上传-->
+          </div>
+        </div>
+
+<% include ../footer.html %>
+<script src="/js/ajaxfileupload.js"></script> 
+<script type="text/javascript">
+function upload(id, url){
+  $.ajaxFileUpload({
+    url: '/common/upload',
+    secureuri: false,
+    fileElementId: 'img',
+    dataType: 'json',
+    success: function (data, status) {
+      console.log(JSON.stringify(data));
+      alert(data);
+    },
+    error: function (data, status, e) {
+      console.log(JSON.stringify(data));
+      alert("上传失败！" + e);
+    }
+  });
+}
+</script>
+
+<!--
+<script type="text/javascript">
+function upload(id, url){
+  var data = new FormData()
+  var files = $('#'+id)[0].files;
+  if (files) {
+    data.append("file", files[0]);
+    $.ajax({
+          type: 'post',
+          dataType: 'json',
+          url: '/common/upload',
+          data: data,
+          contentType: false,
+          processData: false,
+          complete: function(data){
+            if(data.status==200){
+              alert("上传成功！");
+              $('#'+url).attr('src', data.responseText);
+            }
+            else{
+              alert("文件上传失败2！");
+            }
+          }
+        })    
+  } else {
+    alert("文件上传失败1！");
+  }
+}
+-->
+</script>

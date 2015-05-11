@@ -1,6 +1,6 @@
 <% include ../header.html %>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <h3 class="page-header">房间管理&nbsp;>&nbsp;创建房间</h3>       
+          <h4 class="page-header">房间管理&nbsp;>&nbsp;创建房间</h4>       
           <% if(result.error){ %>
             <div class="alert alert-danger" role="alert">
               <strong><%- result.error %></strong>
@@ -14,27 +14,13 @@
           <% } %>
           <div class="row placeholders">
             <form class="form-horizontal" method="post" action="/room/doCreate">
-                  <div class="form-group">
-                    <label for="inputEmail3" class="col-sm-2 control-label">房间名称：</label>
-                    <div class="col-sm-4">
-                      <input name="name" class="form-control">
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label for="inputPassword3" class="col-sm-2 control-label">房间类型：</label>
-                    <div class="col-sm-4">
-                      <select class="form-control" name="type">
-                        <option value="individual">个人房间</option>
-                        <option value="offical">官方房间</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-4">
-                      <button type="submit" class="btn btn-default btn-primary">创建房间</button>
-                    </div>
-                  </div>
-                </form>            
+              <%- createForm %>
+              <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-4">
+                  <button type="submit" class="btn btn-default btn-primary">创建房间</button>
+                </div>
+              </div>
+            </form>            
           </div>
         </div>   
 <% include ../footer.html %>
