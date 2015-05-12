@@ -1,10 +1,23 @@
 var formidable = require('formidable');
 var fs = require('fs');
+var fileUpload = require('./fileUpload.js');
 
 module.exports = function (options) {
 	var seneca = this;
 	var router = this.export('web/httprouter');
 
+	seneca.add({role:'common',cmd:'init'},	cmd_init);
+
+	function cmd_init(args, callback){
+		seneca.uploadServe = fileUpload.build(args.data.uploadPort);
+		callback(null, null);
+	}
+
+	seneca.act({role:'common',cmd:'init',data:{uploadPort:8888}}, function (err, uploadServe){
+		console.log("Upload serve start on port 8888!");
+	});
+
+	/*
 	//图片上传公共接口，返回图片地址
 	seneca.act('role:web', {use:router(function (app){
 		app.post('/common/upload', onUpload);
@@ -46,6 +59,7 @@ module.exports = function (options) {
 			}
 		});
 	}
+	*/
 }
 
 function toImageHTML(labelText, id) {

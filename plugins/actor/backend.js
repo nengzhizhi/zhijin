@@ -41,16 +41,16 @@ module.exports = function (options) {
 					label: '所属节目：'
 				}),
 				'avatar': fields.string({
-					widget: widgets.hidden()
+					widget: widgets.file(),
+					label: '选手头像：',
+					cssClasses: ['btn', 'btn-success']
 				})
 			});
 
 			res.render(
 				'admin/actor/create', 
 				{ 
-					result:'', 
-					form:seneca.createForm.toHTML(common.bootstrapField), 
-					actorImg:common.toImageHTML('选手图片：', 'img') 
+					form:seneca.createForm.toHTML(common.bootstrapField)
 				}
 			);			
 		})
@@ -78,8 +78,7 @@ module.exports = function (options) {
 					'admin/actor/create', 
 					{ 
 						result:{ error:err }, 
-						form:result.toHTML(common.bootstrapField), 
-						actorImg:common.toImageHTML('选手图片：', 'img') 
+						form:result.toHTML(common.bootstrapField)
 					}
 				);				
 			} else if (err) {
@@ -87,8 +86,7 @@ module.exports = function (options) {
 					'admin/actor/create', 
 					{ 
 						result:{ error:err }, 
-						form:seneca.createForm.toHTML(common.bootstrapField), 
-						actorImg:common.toImageHTML('选手图片：', 'img') 
+						form:seneca.createForm.toHTML(common.bootstrapField)
 					}
 				);							
 			} else {
@@ -96,8 +94,7 @@ module.exports = function (options) {
 					'admin/actor/create', 
 					{ 
 						result:{'success':'上传成功！'}, 
-						form:seneca.createForm.toHTML(common.bootstrapField), 
-						actorImg:common.toImageHTML('选手图片：', 'img') 
+						form:seneca.createForm.toHTML(common.bootstrapField)
 					}
 				);				
 			}

@@ -2,20 +2,40 @@ var async = require('async');
 
 module.exports = function(options) {
 	var seneca = this;
+	//此数据需要共享
+	seneca.countdownHandle = [];
 
 	//开启互动 for power card
-	seneca.add({role:'prop',cmd:'createProp'}			cmd_createProp)
+	seneca.add({role:'prop',cmd:'createProp'},			cmd_createProp);
 	seneca.add({role:'prop',cmd:'listProp'},			cmd_listProp);
 	seneca.add({role:'prop',cmd:'createInteraction'},	cmd_createInteraction);
-	seneca.add({role:'prop',cmd:'updateInteraction'},	cmd_updateInteraction);
 	seneca.add({role:'prop',cmd:'startInteraction'},	cmd_startInteraction);
 	seneca.add({role:'prop',cmd:'stopInteraction'},		cmd_stopInteraction);
-
+	//seneca.add({role:'prop',cmd:'claerInteraction'},	cmd_clearInteraction);
 
 	function cmd_createProp(args, callback){
 		var prop = seneca.make$('prop');
 
 		prop.name = args.data.name;
+		prop.type = args.data.type;
+		prop.countdown = {
+			"buy" : 5,
+			"endBuy" : 5,
+			"use" : 5,
+			"endUse" : 5		
+		};
+		prop.menu = {
+			"options" : [
+				{
+					"name" : "xxxxx",
+					"icon" : "http://xxxx.png"
+				}
+			]		
+		}
+
+		prop.save$(function (err, entity){
+			callback(err, entity);
+		});
 	}
 
 	function cmd_listProp(args, callback){
@@ -33,19 +53,19 @@ module.exports = function(options) {
 
 		//TODO check input
 
-		async.waterfall({
-			checkRoom : function (next) {
+		async.waterfall([
+			function (next) {
 				var collection = seneca.make$('interaction');
 
-				collection.load$({roomId:roomId, status:true}, function (err, interaction)){
+				collection.load$({roomId:roomId, status:true}, function (err, interaction){
+					console.log(interaction);
 					if (interaction) {
 						next("Room already has an interaction!", null);
 					} else {
 						next(null, interaction);
 					}
-				}
-			},
-			getProp : function (interaction, next) {
+				})
+			},function (interaction, next) {
 				var collection = seneca.make$('prop');
 
 				collection.load$({id:propId}, function (err, prop){
@@ -55,18 +75,12 @@ module.exports = function(options) {
 						next(null, prop);
 					}
 				});
-			},
-			createInteraction : function (prop, next) {
+			},function (prop, next) {
 				var interaction = seneca.make$('interaction');
 	
 				interaction.prop = prop;
 				interaction.roomId = roomId;
-				interaction.countdown = {
-					buy : 5,
-					endBuy : 5,
-					use : 5,
-					endUse: 5
-				}
+				interaction.countdown = prop.countdown;
 				interaction.status = true;
 				interaction.actors = actors;
 				interaction.menu = prop.menu;
@@ -75,55 +89,82 @@ module.exports = function(options) {
 					next(err, interaction);
 				});
 			}
-		}, function (err, result){
+		], function (err, result){
 			callback(err, result);
 		});
 	}
 
-
 	function cmd_startInteraction(args, callback){
-		var interactionId = args.data.interaction.id;
+		var interactionId = args.data.interactionId;
 
-		async.waterfall({
-			getInteraction : function (next){
+		async.waterfall([
+			function (next){
 				var collection = seneca.make$('interaction');
 
-				collection.load$({id:interactionId, function (err, interaction) {
+				collection.load$({id:interactionId}, function (err, interaction) {
 					next(err, interaction);
-				}});
-			},
-		})
-	}
+				});
+			}, function (interaction, next) {
+				if (interaction) {
+					interaction.status = true;
 
+					seneca.countdownHandle[interaction.id] = setInterval(function(){
+						if (interaction.countdown.buy > 0) {
+							interaction.countdown.buy --;
+						} else if(interaction.countdown.endBuy > 0) {
+							interaction.countdown.endBuy --;
+						} else if(interaction.countdown.use > 0) {
+							interaction.countdown.use --;
+						} else if(interaction.countdown.endUse > 0) {
+							interaction.countdown.endUse --;
+						} else {
+							interaction.status = false;
+						}
 
-	function cmd_countdownInteraction(args, callback){
-		var interactionId = args.data.interaction.id;
+						if (interaction.status == false) {
+							clearInterval(seneca.countdownHandle[interaction.id]);
+						}
 
-		async.waterfall({
-			getInteraction : function (next){
-				var collection = seneca.make$('interaction');
+						console.log('interaction = ' + interaction + '\r\n');
+					}, 1000);
 
-				collection.load$({id:interactionId, function (err, interaction) {
-					next(err, interaction);
-				}});
-			},
-			countdown : function (interaction, next) {
-				if ( !interaction.status ) {
-					next();
-				} else if (interaction.countdown.buy > 0) {
-					interaction.countdown.buy --;
-				} else if(interaction.countdown.endBuy > 0) {
-					interaction.countdown.endBuy --;
-				} else if(interaction.countdown.use > 0) {
-					interaction.countdown.use --;
-				} else if(interaction.countdown.endUse > 0) {
-					interaction.countdown.endUse --;
+					next(null, null);
 				} else {
-					interaction.status = false;
+					next("interaction dose not exist!", null);
 				}
 			}
+		], function (err, result){
+			callback(err, result);
+		});
+	}
 
-		})
+	function cmd_stopInteraction(args, callback){
+		var interactionId = args.data.interactionId;
+
+		async.waterfall([
+				function (next) {
+					var collection = seneca.make$('interaction');
+
+					collection.load$({id:interactionId}, function (err, interaction){
+						next(err, interaction);
+					});
+				}, function (interaction, next){
+					if (!interaction){
+						next("can't find interaction");
+					} else {
+						if (interaction.status) {
+							clearInterval(seneca.countdownHandle[interaction.id]);
+							interaction.status = false;
+							interaction.save$(function (err, entity){
+								next(err, entity);
+							});
+						}
+						next(null, null);
+					}
+				}
+			], function (err, result){
+				callback(err, result);
+			});
 	}
 
 	return { name : 'prop' };
