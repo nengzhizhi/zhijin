@@ -23,8 +23,7 @@
                 <div class="col-sm-4">
                   <div id="progress" class="progress">
                       <div class="progress-bar progress-bar-success progress-bar-striped"></div>
-                  </div>
-                  <div id="files" class="files"></div>                
+                  </div>             
                 </div>
               </div>
               <div class="form-group">
@@ -47,7 +46,8 @@ $('#fileupload').fileupload({
   dataType: 'json',
   done: function (e, data) {
     $.each(data.result.files, function (index, file) {
-      $('<p/>').text(file.name).appendTo('#files');
+      //$('<p/>').text(file.name).appendTo('#files');
+      //$('#result').text('上传成功！');
     });
   },
   progressall: function (e, data) {

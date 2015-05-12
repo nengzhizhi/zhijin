@@ -5,7 +5,7 @@ var bodyParser = require('body-parser');
 
 seneca.use(
 	'mongo-store',
-	{name:'zhijin', host:'192.168.1.234', port: 27019}
+	{name:'zhijin', host:'112.124.117.146', port: 27017, usename:'zhijin', password:'b933defa'}
 );
 
 seneca.use('/plugins/room/backend');

@@ -42,8 +42,9 @@ module.exports = function (options) {
 				}),
 				'avatar': fields.string({
 					widget: widgets.file(),
-					label: '选手头像：',
-					cssClasses: ['btn', 'btn-success']
+					required: validators.required('请上传选手图片！'),
+					label: '选手图片：',
+					id: 'fileupload'
 				})
 			});
 
