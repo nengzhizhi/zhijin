@@ -16,11 +16,12 @@ module.exports = function (options) {
 		app.get('/actor/create', onCreate);
 		app.post('/actor/doCreate', onDoCreate);
 		app.get('/actor/list', onList);
+		app.get('/actor/delete', onDelete);
 	})});
 
 	function onCreate(req, res){
 		async.waterfall([function (next){
-			seneca.act({role:'program',cmd:'list',data:{}}, function (err, programs){
+			seneca.act({role:'program',cmd:'listProgram',data:{}}, function (err, programs){
 				next(err, programs);
 			});
 		}], function (err, result){
@@ -43,14 +44,14 @@ module.exports = function (options) {
 				'avatar': fields.string({
 					widget: widgets.file(),
 					required: validators.required('请上传选手图片！'),
-					label: '选手图片：',
-					id: 'fileupload'
+					label: '选手图片：'
 				})
 			});
 
 			res.render(
 				'admin/actor/create', 
-				{ 
+				{
+					result: {},				 
 					form:seneca.createForm.toHTML(common.bootstrapField)
 				}
 			);			
@@ -60,15 +61,19 @@ module.exports = function (options) {
 	function onDoCreate(req, res){
 		async.waterfall([
 			function (next){
-				seneca.createForm.handle(req,{
-					success: function (form){
-						next(null, form);
-					},
-					other: function (form){
-						//FIXME
-						next("Invalid input", form);
-					}
-				});
+				if (seneca.createForm) {
+					seneca.createForm.handle(req,{
+						success: function (form){
+							next(null, form);
+						},
+						other: function (form){
+							//FIXME
+							next("Invalid input", form);
+						}
+					});
+				} else {
+					next("Invalid input", null);
+				}
 		}, function (form, next){
 			seneca.act({role:'actor', cmd:'create', data:form.data}, function (err, result){
 				next(err, result);
@@ -94,7 +99,7 @@ module.exports = function (options) {
 				res.render(
 					'admin/actor/create', 
 					{ 
-						result:{'success':'上传成功！'}, 
+						result:{'success':'创建成功！'}, 
 						form:seneca.createForm.toHTML(common.bootstrapField)
 					}
 				);				
@@ -113,6 +118,24 @@ module.exports = function (options) {
 			} else {
 				res.render('admin/actor/list', {list:result});
 			}
+		});
+	}
+
+	function onDelete(req, res){
+		async.waterfall([function (next){
+			seneca.act({role:'actor', cmd:'delete', data:{id:req.query.id}}, function (err, result){
+				next(err, result);
+			});
+		}], function (err, result){
+			if (err) {
+				res.render('404');
+			} else {
+				res.render(
+					'admin/actor/list', 
+					{
+						list:result
+					});
+			}			
 		});
 	}
 }

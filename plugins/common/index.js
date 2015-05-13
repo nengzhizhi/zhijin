@@ -93,11 +93,31 @@ function bootstrapField(name, object) {
 	if(object.widget.type == 'multipleCheckbox'){
 		var html = 
 				'<div class="form-group ' + validationclass + '">' + label + 
-				'<div class="col-sm-6"><a href="#' + name + '" class="btn btn-primary" data-toggle="collapse" aria-expanded="false" aria-controls="' + name + '">选择</a>' +
+				'<div class="col-sm-4"><a href="#' + name + '" class="btn btn-primary form-control" data-toggle="collapse" aria-expanded="false" aria-controls="' + name + '">选择</a>' +
 				'<div class="collapse" id="' + name + '" aria-expanded="false"><div class="well">' +
 				widget +
 				'</div></div></div></div>';
 		return html;
+	} else if (object.widget.type == 'file') {
+		var html = 
+				'<div class="form-group ' + validationclass + '">' + label + 
+				'<div class="col-sm-4">' +
+                  '<span class="btn btn-success form-control fileinput-button">' +
+                      '<i class="glyphicon glyphicon-plus"></i>' +
+                      '<span>选择文件..</span>' +
+                      '<input id="' + name +'" name="' + name + '" type="hidden">' +
+                      '<input id="fileupload" type="file">' +
+                  '</span>' +              
+                '</div>'  + error + '</div>' +
+              '<div class="form-group">' +
+                '<label for="id_name" class="control-label col-sm-2"></label>' +
+                '<div class="col-sm-4">' +
+                  '<div id="progress" class="progress">' +
+                      '<div class="progress-bar progress-bar-success progress-bar-striped"></div>' +
+                  '</div>' +
+                '</div>' + 
+              '</div>';                
+        return html;
 	} else {
 		return '<div class="form-group ' + validationclass + '">' + label + '<div class="col-sm-4">' + widget + '</div>' + error + '</div>';	
 	}

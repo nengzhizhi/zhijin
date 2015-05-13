@@ -1,7 +1,7 @@
 <% include ../header.html %>
 
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <h3 class="page-header">分期管理&nbsp;>&nbsp;创建分期</h3>
+          <h4 class="page-header">分期管理&nbsp;>&nbsp;创建分期</h4>
           <% if(result.error){ %>
             <div class="alert alert-danger" role="alert">
               <strong><%- result.error %></strong>
@@ -16,59 +16,14 @@
 
           <div class="row placeholders">
             <form class="form-horizontal" action="/episode/doCreate" method="post">
-                  <div class="form-group">
-                    <label class="col-sm-2 control-label">分期名称：</label>
-                    <div class="col-sm-4">
-                      <input name="name" class="form-control" id="name" type="text">
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label class="col-sm-2 control-label">分期编号：</label>
-                    <div class="col-sm-4">
-                      <input name="number" class="form-control" type="text">
-                    </div>
-                  </div>                  
-                  <div class="form-group">
-                    <label class="col-sm-2 control-label">所属节目：</label>
-                    <div class="col-sm-4">
-                      <select class="form-control" name="program">
-                        <% for(var i=0;i<programs.length;i++){ %>
-                        <option value="<%- programs[i].name %>"><%- programs[i].name %></option>
-                        <% } %>
-                      </select>
-                    </div>
-                  </div>                  
-                  <div class="form-group">
-                    <label class="col-sm-2 control-label">开始时间：</label>
-                    <div class="col-sm-4">
-                      <div class="input-append date form_datetime">
-                          <input class="form-control" type="text" value="" readonly name="startTime">
-                          <span class="add-on"><i class="icon-th"></i></span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label class="col-sm-2 control-label">结束时间：</label>
-                    <div class="col-sm-4">
-                      <div class="input-append date form_datetime">
-                          <input class="form-control" type="text" value="" readonly name="endTime">
-                          <span class="add-on"><i class="icon-th"></i></span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-4">
-                      <button type="submit" class="btn btn-default btn-primary">创建分期</button>
-                    </div>
-                  </div>
-                </form>            
+              <%- form %>
+              <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-4">
+                  <button type="submit" class="btn btn-default btn-primary form-control">创建分期</button>
+                </div>
+              </div>
+            </form>            
           </div>
 
         </div>      
-<% include ../footer.html %> 
-<script src="/js/bootstrap-datetimepicker.min.js"></script>
-<script type="text/javascript">
-    $(".form_datetime").datetimepicker({
-        format: "dd MM yyyy - hh:ii"
-    });
-</script>     
+<% include ../footer.html %>   

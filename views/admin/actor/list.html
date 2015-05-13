@@ -6,17 +6,19 @@
             <table class="table table-striped">
               <thead>
                 <tr>
+                  <th>选手头像</th>
                   <th>选手名字</th>
                   <th>所属节目</th>
-                  <th></th>
+                  <th>操作</th>
                 </tr>
               </thead>
               <tbody>
                 <% for(var i = 0; i < list.length; i++ ){ %>
                     <tr>
+                      <td><img src="<%- list[i].avatar %>" style="width:100px;height:100px;"></td>
                       <td><%- list[i].name %></td>
                       <td><%- list[i].program %></td>
-                      <td style="text-align:right"><a href="#" class="btn btn-default">选手详情</a></td>
+                      <td><a href="/actor/delete?id=<%-list[i].id %>" class="btn btn-danger">删除</a></td>
                     </tr>
                 <% } %>
               </tbody>

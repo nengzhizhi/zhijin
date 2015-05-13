@@ -1,10 +1,3 @@
-/*
-var fs = require('fs');
-var formidable = require('formidable');
-var bodyParser = require('body-parser');
-var async = require('async');
-*/
-
 var forms = require('forms');
 var async = require('async');
 var fields = forms.fields;
@@ -17,6 +10,7 @@ module.exports = function (options) {
 	var router = this.export('web/httprouter');
 
 	seneca.use('/plugins/prop/service');
+	seneca.use('/plugins/program/service');
 
 	seneca.act(
 			'role:web', 
@@ -36,84 +30,141 @@ module.exports = function (options) {
 			});	
 
 	function onProgramCreate(req, res){
-		res.render('admin/program/create', {result:''});
+		seneca.programForm = forms.create({
+			'name': fields.string({
+				required: validators.required('请输入节目名称！'),
+				errorAfterField: true,
+				label: '节目名称：'				
+			}),
+			'logo': fields.string({
+				widget: widgets.file(),
+				required: validators.required('请上传节目logo！'),
+				label: '节目图片：'
+			}),
+			'description': fields.string({
+				label: '节目描述：',
+				widget: widgets.textarea()
+			})
+		});
+
+		res.render(
+			'admin/program/create', 
+			{
+				result : {},
+				form : seneca.programForm.toHTML(common.bootstrapField)
+			}
+		);
 	}
 
 	function onProgramDoCreate(req, res){
-		var form = new formidable.IncomingForm();   //创建上传表单
-		form.encoding = 'utf-8';        //设置编辑
-		form.uploadDir = 'public/upload/';     //设置上传目录
-		form.keepExtensions = true;     //保留后缀
-		form.maxFieldsSize = 2 * 1024 * 1024;   //文件大小
-
-		form.parse(req, function(err, fields, files) {
-			if (err) {
-				res.render('admin/program/create', {result:{'error':err}});
-				return;        
-			}
-
-			if(!fields.name){
-				res.render('admin/program/create', {result:{'error':'节目名不能为空!'}});
-				return;
-			}
-
-			if(!fields.description){
-				res.render('admin/program/create', {result:{'error':'节目描述不能为空!'}});
-				return;				
-			}
-	       
-			var extName = '';  //后缀名
-			switch (files.logo.type) {
-				case 'image/pjpeg':
-					extName = 'jpg';
-					break;
-				case 'image/jpeg':
-					extName = 'jpg';
-					break;         
-				case 'image/png':
-					extName = 'png';
-					break;
-				case 'image/x-png':
-					extName = 'png';
-					break;         
-			}
-
-			if(extName.length == 0){
-				res.render('admin/program/create', {result:{'error':'只支持png和jpg格式图片'}});
-				return;                   
-			}
-
-			var fileName = Math.random() + '.' + extName;
-			var filePath = form.uploadDir + fileName;
-
-			fs.renameSync(files.logo.path, filePath);  //重命名
-
-			var program = seneca.make$('program');
-			program.name = fields.name;
-			program.description = fields.description;
-			program.logoUrl = '/upload/' + fileName;
-			program.save$(function (err,program){
-				if (program.id) {
-					res.render('admin/program/create', {result:{'success':'创建成功！'}});
-					return;						
+		async.waterfall([
+				function (next) {
+					if (seneca.programForm) {
+						seneca.programForm.handle(req,{
+							success: function (form){
+								next(null, form);
+							},
+							other: function (form){
+								//FIXME
+								next("Invalid input", form);
+							}
+						})
+					} else {
+						next("Invalid input", null);
+					}
+			}, function (form, next) {
+				seneca.act({role:'program',cmd:'createProgram',data:form.data}, function (err, result){
+					next(err, result);
+				})
+			}], function (err, result){
+				if ( err == "Invalid input") {
+					res.render(
+						'admin/program/create', 
+						{ 
+							result:{ error:err }, 
+							form:result.toHTML(common.bootstrapField)
+						}
+					);				
+				} else if (err) {
+					res.render(
+						'admin/program/create', 
+						{ 
+							result:{ error:err }, 
+							form:seneca.createForm.toHTML(common.bootstrapField)
+						}
+					);							
+				} else {
+					res.render(
+						'admin/program/create', 
+						{ 
+							result:{'success':'创建成功！'}, 
+							form:seneca.createForm.toHTML(common.bootstrapField)
+						}
+					);				
 				}
 			});
-			return;
-		});
 	}
 
 	function onProgramList(req, res){
-		var programs = this.make$('program');
-		programs.list$({}, function (err, programs){
-			res.render('admin/program/list', {list:programs});
-		});
+		async.waterfall([
+			function (next) {
+				seneca.act({role:'program',cmd:'listProgram',data:{}}, function (err, programs){
+					next(err, programs);
+				})
+			}
+		], function (err, result){
+			res.render('admin/program/list', {list:result});
+		})
 	}
 
 	function onEpisodeCreate(req, res){
-		var collection = this.make$('program');
-		collection.list$({}, function (err, results){
-			res.render('admin/episode/create',{result:'', programs:results});
-		});
+		async.waterfall([
+				function (next) {
+					seneca.act({role:'program',cmd:'listProgram',data:{}}, function (err, programs){
+						next(err, programs);
+					})
+				}
+			], function (err, result){
+				var programs = {};
+				for(var i=0;i<result.length;i++){
+					programs[result[i].id] = result[i].name;
+				};
+
+				seneca.episodeForm = forms.create({
+					'name': fields.string({
+						required: validators.required('请输入分期名称！'),
+						errorAfterField: true,
+						label: '分期名称：'				
+					}),
+					'number': fields.string({
+						required: validators.required('请输入分期编号！'),
+						errorAfterField: true,
+						label: '分期编号：'					
+					}),
+					'program': fields.string({
+						label: '所属节目：',
+						widget: widgets.select(),
+						choices: programs				
+					}),
+					'startTime': fields.date({
+						label: '开始时间：',
+						required: validators.required('请输入正确的开始时间！')
+					}),
+					'endTime': fields.date({
+						label: '结束时间：',
+						required: validators.required('请输入正确的结束时间！')
+					})
+				});
+
+				res.render(
+					'admin/episode/create',
+					{
+						result : {},
+						form : seneca.episodeForm.toHTML(common.bootstrapField)
+					}
+				);				
+			}
+		);
 	}
 
 	function onEpisodeList(req, res){
@@ -124,146 +175,204 @@ module.exports = function (options) {
 	}
 
 	function onEpisodeEdit(req, res){
-		var episode = {};
-		var props = {};
-		var selectProps = [];
+		var programId;
+		var episode;
 
-		async.waterfall([
-			function (next){
-				seneca.act({role:'program',cmd:'getEpisode',data:{program:req.query.id}}, function (err, result){
+		async.series({
+			episode : function(next){
+				seneca.act({role:'program',cmd:'getEpisode',data:{id:req.query.id}}, function (err,result){
+					programId = result.program.id;
 					episode = result;
-					next(err, null);
+					next(err, result);
 				});
 			},
-			function (result, next) {
-				seneca.act({role:'prop', cmd:'list',data:{program:req.query.id}}, function (err, document){
-					for (var i = 0; i < document.length; i++) {
-						props[document[i].name] = document[i].id;
-						if ( episode.props && episode.props.indexOf(document[i].id) >=0 ){
-							selectProps.push(document[i].id);
+			prop : function(next){
+				seneca.act({role:'prop',cmd:'listProp',data:{program:programId}}, function (err,result){
+					var props = {};
+					var selectProps = [];
+					for (var i=0;i<result.length;i++) {
+						props[result[i].id] = result[i].name;
+						if (episode.props && episode.props.indexOf(result[i].id) >= 0) {
+							selectProps.push(result[i].id);
 						}
 					}
-					next(err, null);
+					next(err, {props:props, selectProps:selectProps});
+				})
+			},
+			actor : function(next){
+				seneca.act({role:'actor',cmd:'list',data:{program:programId}}, function (err, result){
+					var actors = {};
+					var selectActors = [];
+					for (var i=0;i<result.length;i++) {
+						actors[result[i].id] = result[i].name;
+						if (episode.actors && episode.actors.indexOf(result[i].id) >= 0) {
+							selectActors.push(result[i].id);
+						}
+					}
+					next(err, {actors:actors, selectActors:selectActors});
 				});
-			}
-		], function (err, result){
-			seneca.editForm = forms.create({
+			} 
+		}, function (err, result){
+			seneca.episodeEditForm = forms.create({
 				'name': fields.string({
 					required: validators.required('请输入分期名称！'),
 					label: '分期名称：',
-					value: episode.name
+					value: result.episode.name
 				}),
-				'number': fields.number({
-					required: validators.required('请输入分期编号！'),
+				'number': fields.string({
+					required: validators.required('请输入正确分期编号！'),
 					label: '分期编号：',
-					value: episode.number
+					value: result.episode.number
 				}),
 				'startTime': fields.date({
 					required: validators.required('请输入分期开始时间！'),
 					label: '开始时间：',
-					value: episode.startTime
+					value: result.episode.startTime
 				}),
 				'endTime': fields.date({
 					required: validators.required('请输入分期结束时间！'),
 					label: '结束时间：',
-					value: episode.endTime
-				}),
-				'actors': fields.string({
-					choices: {one: 'Item one', two: 'Item two', three: 'Item three'},
+					value: result.episode.endTime
+				}),				
+				'actors': fields.array({
+					choices: result.actor.actors,
+					value: result.actor.selectActors,
 					widget: widgets.multipleCheckbox(),
 					label: '本期选手：'
 				}),
-				'props': fields.string({
-					choices: props,
-					value: selectProps, 
+				'props': fields.array({
+					choices: result.prop.props,
+					value: result.prop.selectProps, 
 					widget: widgets.multipleCheckbox(),
 					label: '本期道具：'
 				}),
-				'gifts': fields.string({
-					choices: {one: 'Item one', two: 'Item two', three: 'Item three'},
-					widget: widgets.multipleCheckbox(),
-					label: '本期礼物：'
-				}),											
+				'id': fields.string({
+					widget: widgets.hidden(),
+					value: result.episode.id
+				})				
 			});
 
 			res.render(
 				'admin/episode/edit', 
 				{
 					result : '', 
-					editForm : seneca.editForm.toHTML(common.bootstrapField)
+					editForm : seneca.episodeEditForm.toHTML(common.bootstrapField)
 				}
-			);
-		});
+			);			
+		})
 	}
 
 	function onEpisodeDetail(req, res){
-		if (!req.query.id) {
-			res.render('404');
-		}
-
-		var collection = seneca.make$('episode');
-		collection.load$({id:req.params.id}, function (err, episode){
-			res.render('admin/episode/detail', {result:'', 'episode':episode});
+		async.series([
+			function (next){
+				seneca.act({role:'program',cmd:'getEpisode',data:{id:req.query.id}}, function (err, episode){
+					next(err, episode);
+				});
+			}	
+		], function (err, result){
+			res.render('admin/episode/detail', {result:{},episode:result[0]});
 		});		
 	}
 
 	function onEpisodeDoCreate(req, res){
-		var seneca = this;
-		if (!req.body.name) {
-			res.render('admin/episode/create', {result:{'error':'分期名不能为空!'}});
-			return;			
-		}
-
-		if (!req.body.number) {
-			res.render('admin/episode/create', {result:{'error':'分期编号不能为空!'}});
-			return;			
-		}
-
-		if (!req.body.startTime) {
-			res.render('admin/episode/create', {result:{'error':'开始时间不能为空!'}});
-			return;			
-		}
-
-		if (!req.body.endTime) {
-			res.render('admin/episode/create', {result:{'error':'结束时间不能为空!'}});
-			return;			
-		}
-
-		var episode = seneca.make$('episode');
-		episode.name = req.body.name;
-		episode.number = req.body.number;
-		episode.program = req.body.program;
-		episode.startTime = req.body.startTime;
-		episode.endTime = req.body.endTime;
-		episode.save$(function (err, episode){
-			if (episode.id) {
-				var collection = seneca.make$('program');
-				collection.list$({}, function (errors, results){
-					res.render('admin/episode/create',{result:{'success':'创建成功！'}, programs:results});
-					return;
-				});						
-			}		
-		});
-		return;
+		async.waterfall([
+				function (next) {
+					if (seneca.episodeForm) {
+						seneca.episodeForm.handle(req, {
+							success: function (form){
+								next(null, form);
+							},
+							other: function (form){
+								//FIXME
+								next("Invalid input", form);
+							}
+						});
+					}
+				}, function (form, next) {
+					seneca.act({role:'program',cmd:'getProgram',data:{id:form.data.program}}, function (err, result){
+						form.data.program = result;
+						next(err, form);
+					});
+				}, function (form, next) {
+					seneca.act({role:'program',cmd:'createEpisode',data:form.data}, function (err, result){
+						next(err, result);
+					});
+				}
+			], function (err, result){
+				if ( err == "Invalid input") {
+					res.render(
+						'admin/episode/create', 
+						{ 
+							result:{ error:err }, 
+							form:result.toHTML(common.bootstrapField)
+						}
+					);				
+				} else if (err) {
+					res.render(
+						'admin/episode/create', 
+						{ 
+							result:{ error:err }, 
+							form:seneca.episodeForm.toHTML(common.bootstrapField)
+						}
+					);							
+				} else {
+					res.render(
+						'admin/episode/create', 
+						{ 
+							result:{'success':'创建成功！'}, 
+							form:seneca.episodeForm.toHTML(common.bootstrapField)
+						}
+					);				
+				}				
+			})
 	}
 
 	function onEpisodeUpdate(req, res) {
-		var episode = seneca.make$('episode');
-
-		if ( req.body.id ){
-			episode.id = req.body.id;
-		} else {
-			res.render('admin/episode/edit',{result:{'error':'分期不存在！'}});
-			return;
-		}
-
-		if( req.body.prop ){
-			episode.props = req.body.prop;
-		}
-
-		episode.save$(function (err, episode) {
-			if (episode.id) {
-				res.render('admin/episode/edit',{result:{'success':'创建成功！'}});
+		async.waterfall([
+			function (next){
+				if (seneca.episodeEditForm) {
+					seneca.episodeEditForm.handle(req, {
+						success : function(form){
+							next(null, form);
+						},
+						other : function(form){
+							next("Invalid input", form);
+						}
+					});
+				} else {
+					next("Invalid input1", null);
+				}
+			},
+			function (form, next) {
+				seneca.act({role:'program',cmd:'updateEpisode', data:form.data}, function (err, entity){
+					next(err, entity);
+				});
+			}
+		], function (err, result){
+			if ( err == "Invalid input") {
+				res.render(
+					'admin/episode/edit', 
+					{ 
+						result:{ error:err }, 
+						editForm:result.toHTML(common.bootstrapField)
+					}
+				);				
+			} else if (err) {
+				res.render(
+					'admin/episode/edit', 
+					{ 
+						result:{ error:err }, 
+						editForm:seneca.episodeEditForm.toHTML(common.bootstrapField)
+					}
+				);							
+			} else {
+				res.render(
+					'admin/episode/edit', 
+					{ 
+						result:{'success':'创建成功！'}, 
+						editForm:seneca.episodeEditForm.toHTML(common.bootstrapField)
+					}
+				);				
 			}
 		});
 	}

@@ -1,8 +1,11 @@
+//TODO 后期改成向静态cdn上传
+
 var path = require('path');
 var fs = require('fs');
 var formidable = require('formidable');
 var nodeStatic = require('node-static');
 var imageMagick = require('imagemagick');
+var UUID = require('node-uuid');
 
 function fileUpload(){
     options = {
@@ -224,6 +227,7 @@ function fileUpload(){
                 fs.unlink(file.path);
                 return;
             }
+            fileInfo.name = UUID.v1() + fileInfo.name.split('.')[1];
             fs.renameSync(file.path, options.uploadDir + '/' + fileInfo.name);
             if (options.imageTypes.test(fileInfo.name)) {
                 Object.keys(options.imageVersions).forEach(function (version) {

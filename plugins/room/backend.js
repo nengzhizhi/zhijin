@@ -26,19 +26,32 @@ module.exports = function (options) {
 			});
 
 	seneca.createForm = forms.create({
-		name: fields.string({
+		'name': fields.string({
 			required: validators.required('请输入房间名称'),
 			errorAfterField: true,
 			label: '房间名称：'
 		}),
-		type: fields.string({
+		'type': fields.string({
 			label: '房间类型：',
 			widget: widgets.select(),
 			choices: {
 				individual: '个人房间',
 				offical : '官方房间'
 			}
-		})
+		}),
+		'camera1':fields.string({
+			label: '机位一：',
+			required: validators.required('请输入主机位地址')
+		}),
+		'camera2':fields.string({
+			label: '机位二：'
+		}),
+		'camera3':fields.string({
+			label: '机位三：'
+		}),
+		'camera4':fields.string({
+			label: '机位四：'
+		})				
 	});
 
 	function onCreate(req, res) {
@@ -114,16 +127,25 @@ module.exports = function (options) {
 				seneca.act({role:'room',cmd:'get',data:{id:req.query.id}}, function (err, room){
 					next(err, room);
 				});
+			},
+			episode : function (next) {
+				seneca.act({role:'program',cmd:'listEpisode',data:{}}, function (err, result){
+					var episodes = {};
+					for(var i=0;i<result.length;i++){
+						episodes[result[i].id] = result[i].program.name + '-' + result[i].number + '-' +result[i].name;
+					}
+					next(err, { episodes : episodes });
+				})
 			}
 		}, function (err, result){
 			seneca.editForm = forms.create({
-				name: fields.string({
+				'name': fields.string({
 					required: validators.required('请输入房间名称'),
 					errorAfterField: true,
 					label: '房间名称：',
 					value: result.room.name
 				}),
-				type: fields.string({
+				'type': fields.string({
 					label: '房间类型：',
 					widget: widgets.select(),
 					choices: {
@@ -131,6 +153,12 @@ module.exports = function (options) {
 						offical : '官方房间'
 					},
 					value: result.room.type
+				}),
+				'episode': fields.string({
+					label: '选择分期：',
+					widget: widgets.select(),
+					choices: result.episode.episodes,
+					value: result.room.episode?result.room.episode.id:result.room.episode
 				})
 			});
 
