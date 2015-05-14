@@ -7,9 +7,10 @@
 module.exports = function (options) {
 	var seneca = this;
 
-	this.add({role:'room',cmd:'get'}, cmd_get);
-	this.add({role:'room',cmd:'list'}, cmd_list);
-	this.add({role:'room',cmd:'save'}, cmd_save);
+	this.add({role:'room',cmd:'get'},		cmd_get);
+	this.add({role:'room',cmd:'list'},		cmd_list);
+	this.add({role:'room',cmd:'create'},	cmd_create);
+	this.add({role:'room',cmd:'update'},	cmd_update);
 
 	function cmd_get(args, callback){
 		var collection = seneca.make$('room');
@@ -27,13 +28,27 @@ module.exports = function (options) {
 		});		
 	}
 
-	function cmd_save(args, callback){
+	function cmd_create(args, callback){
 		var room = seneca.make$('room');
 		room.name = args.data.name;
 		room.type = args.data.type;
+		room.episode = {};
+
 		room.save$(function (err, room){
 			callback(err, room);
 		});
+	}
+
+	function cmd_update(args, callback){
+		var collection = seneca.make$('room');
+
+		for(var key in args.data){
+			collection[key] = args.data[key];
+		}
+
+		collection.save$(function (err, room){
+			callback(err, room);
+		})
 	}
 
 	return { name : 'service' };

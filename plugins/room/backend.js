@@ -4,6 +4,7 @@ var fields = forms.fields;
 var validators = forms.validators;
 var widgets = forms.widgets;
 var common = require('../common/index.js');
+var error = require('./roomError.js');
 
 
 module.exports = function (options) {
@@ -22,39 +23,40 @@ module.exports = function (options) {
 					app.get('/room/list', onList);
 					app.get('/room/detail', onDetail);
 					app.get('/room/edit', onEdit);
+					app.post('/room/update', onUpdate);
 				})
 			});
 
-	seneca.createForm = forms.create({
-		'name': fields.string({
-			required: validators.required('请输入房间名称'),
-			errorAfterField: true,
-			label: '房间名称：'
-		}),
-		'type': fields.string({
-			label: '房间类型：',
-			widget: widgets.select(),
-			choices: {
-				individual: '个人房间',
-				offical : '官方房间'
-			}
-		}),
-		'camera1':fields.string({
-			label: '机位一：',
-			required: validators.required('请输入主机位地址')
-		}),
-		'camera2':fields.string({
-			label: '机位二：'
-		}),
-		'camera3':fields.string({
-			label: '机位三：'
-		}),
-		'camera4':fields.string({
-			label: '机位四：'
-		})				
-	});
-
 	function onCreate(req, res) {
+		seneca.createForm = forms.create({
+			'name': fields.string({
+				required: validators.required('请输入房间名称'),
+				errorAfterField: true,
+				label: '房间名称：'
+			}),
+			'type': fields.string({
+				label: '房间类型：',
+				widget: widgets.select(),
+				choices: {
+					individual: '个人房间',
+					offical : '官方房间'
+				}
+			}),
+			'camera1':fields.string({
+				label: '机位一：',
+				required: validators.required('请输入主机位地址')
+			}),
+			'camera2':fields.string({
+				label: '机位二：'
+			}),
+			'camera3':fields.string({
+				label: '机位三：'
+			}),
+			'camera4':fields.string({
+				label: '机位四：'
+			})				
+		});
+		
 		res.render(
 			'admin/room/create', 
 			{
@@ -72,20 +74,20 @@ module.exports = function (options) {
 							next(null, form);
 						},
 						other : function (form){
-							next("Invalid input", form);
+							next(error.InvalidInput(), form);
 						}
 					});
 				}, function (form, next) {
-					seneca.act({role:'room',cmd:'save','data':form.data}, function (err, result){
+					seneca.act({role:'room',cmd:'create','data':form.data}, function (err, result){
 						next(err, result);
 					});					
 				}
 			], function (err, result){
-				if (err == "Invalid input") {
+				if (err.code == 'InvalidInput') {
 					res.render(
 						'admin/room/create',
 						{
-							result:{ error : err },
+							result:{ error : err.message },
 							createForm:result.toHTML(common.bootstrapField)
 						}
 					);
@@ -93,7 +95,7 @@ module.exports = function (options) {
 					res.render(
 						'admin/room/create',
 						{
-							result:{ error : err },
+							result:{ error : err.message },
 							createForm:seneca.createForm.toHTML(common.bootstrapField)
 						}
 					);
@@ -134,6 +136,7 @@ module.exports = function (options) {
 					for(var i=0;i<result.length;i++){
 						episodes[result[i].id] = result[i].program.name + '-' + result[i].number + '-' +result[i].name;
 					}
+					episodes[0] = '未选择分期';
 					next(err, { episodes : episodes });
 				})
 			}
@@ -158,8 +161,21 @@ module.exports = function (options) {
 					label: '选择分期：',
 					widget: widgets.select(),
 					choices: result.episode.episodes,
-					value: result.room.episode?result.room.episode.id:result.room.episode
-				})
+					value: result.room.episode?result.room.episode.id:0
+				}),
+				'camera1':fields.string({
+					label: '机位一：',
+					required: validators.required('请输入主机位地址')
+				}),
+				'camera2':fields.string({
+					label: '机位二：'
+				}),
+				'camera3':fields.string({
+					label: '机位三：'
+				}),
+				'camera4':fields.string({
+					label: '机位四：'
+				})					
 			});
 
 			res.render('admin/room/edit', { editForm:seneca.editForm.toHTML(common.bootstrapField) });
@@ -176,6 +192,56 @@ module.exports = function (options) {
 		}, function (err, result){
 			res.render('admin/room/detail', { 'room':result.room });
 		});
+	}
+
+	function onUpdate(req, res) {
+		async.waterfall([
+				function (next) {
+					if (seneca.editForm) {
+						seneca.editForm.handle(req, {
+							success : function(form){
+								next(null, form);
+							},
+							other : function(form){
+								next("Invalid input!", form);
+							}
+						});
+					} else {
+						next("Invalid invoke!", null);
+					}
+				},
+				function (form, next) {
+					seneca.act({role:'room',cmd:'update',data:form.data}, function (err, entity){
+						next(err, entity);
+					});
+				}
+			], function (err, result){
+				if (err.code == 'InvalidInput') {
+					res.render(
+							'admin/room/edit',
+							{
+								result : { error : err.message },
+								editForm : result.toHTML(common.bootstrapField)
+							}
+						);
+				} else if (err) {
+					res.render(
+							'admin/room/edit',
+							{
+								result : { error : err.message },
+								editForm : seneca.editForm.toHTML(common.bootstrapField)
+							}
+						);
+				} else {
+					res.render(
+						'admin/episode/edit', 
+						{ 
+							result  : { success : '创建成功！' }, 
+							editForm : seneca.editForm.toHTML(common.bootstrapField)
+						}
+					);					
+				}
+			});
 	}
 
 	return { name : 'backend' };
