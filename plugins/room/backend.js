@@ -42,19 +42,10 @@ module.exports = function (options) {
 					offical : '官方房间'
 				}
 			}),
-			'camera1':fields.string({
-				label: '机位一：',
-				required: validators.required('请输入主机位地址')
-			}),
-			'camera2':fields.string({
-				label: '机位二：'
-			}),
-			'camera3':fields.string({
-				label: '机位三：'
-			}),
-			'camera4':fields.string({
-				label: '机位四：'
-			})				
+			'stream':fields.string({
+				label: '码流地址：',
+				required: validators.required('请输入码流地址！')
+			})			
 		});
 		
 		res.render(
@@ -69,45 +60,31 @@ module.exports = function (options) {
 	function onDoCreate(req, res) {
 		async.waterfall([
 				function (next) {
-					seneca.createForm.handle(req, {
-						success : function (form){
-							next(null, form);
-						},
-						other : function (form){
-							next(error.InvalidInput(), form);
-						}
-					});
+					if (seneca.createForm) {
+						seneca.createForm.handle(req, {
+							success : function (form){
+								next(null, form);
+							},
+							other : function (form){
+								next(error.InvalidInput(), form);
+							}
+						});
+					} else {
+						next(error.InvalidOperate({operate:'[create room]'}), null);
+					}
 				}, function (form, next) {
 					seneca.act({role:'room',cmd:'create','data':form.data}, function (err, result){
 						next(err, result);
 					});					
 				}
 			], function (err, result){
-				if (err.code == 'InvalidInput') {
-					res.render(
+				res.render(
 						'admin/room/create',
 						{
-							result:{ error : err.message },
-							createForm:result.toHTML(common.bootstrapField)
+							result : err?{error:err.message}:{success:'创建成功！'},
+							createForm : result.toHTML?result.toHTML(common.bootstrapField):seneca.createForm.toHTML(common.bootstrapField)
 						}
 					);
-				} else if(err) {
-					res.render(
-						'admin/room/create',
-						{
-							result:{ error : err.message },
-							createForm:seneca.createForm.toHTML(common.bootstrapField)
-						}
-					);
-				} else {
-					res.render(
-						'admin/room/create',
-						{
-							result:{'success':'创建成功！'},
-							createForm:seneca.createForm.toHTML(common.bootstrapField)
-						}
-					);					
-				}
 			});
 	}
 
@@ -161,24 +138,20 @@ module.exports = function (options) {
 					label: '选择分期：',
 					widget: widgets.select(),
 					choices: result.episode.episodes,
-					value: result.room.episode?result.room.episode.id:0
+					value: result.room.episode ? result.room.episode : 0
 				}),
-				'camera1':fields.string({
-					label: '机位一：',
-					required: validators.required('请输入主机位地址')
+				'stream':fields.string({
+					label: '码流地址：',
+					required: validators.required('请输入码流地址！'),
+					value: result.room.stream
 				}),
-				'camera2':fields.string({
-					label: '机位二：'
-				}),
-				'camera3':fields.string({
-					label: '机位三：'
-				}),
-				'camera4':fields.string({
-					label: '机位四：'
-				})					
+				'id':fields.string({
+					widget: widgets.hidden(),
+					value:result.room.id
+				})		
 			});
 
-			res.render('admin/room/edit', { editForm:seneca.editForm.toHTML(common.bootstrapField) });
+			res.render('admin/room/edit', { editForm : seneca.editForm.toHTML(common.bootstrapField) });
 		});
 	}
 
@@ -203,44 +176,25 @@ module.exports = function (options) {
 								next(null, form);
 							},
 							other : function(form){
-								next("Invalid input!", form);
+								next(error.InvalidInput(), form);
 							}
 						});
 					} else {
-						next("Invalid invoke!", null);
+						next(error.InvalidOperate({operate:'[update room]'}), null);
 					}
-				},
-				function (form, next) {
+				}, function (form, next) {
 					seneca.act({role:'room',cmd:'update',data:form.data}, function (err, entity){
 						next(err, entity);
 					});
 				}
 			], function (err, result){
-				if (err.code == 'InvalidInput') {
-					res.render(
-							'admin/room/edit',
-							{
-								result : { error : err.message },
-								editForm : result.toHTML(common.bootstrapField)
-							}
-						);
-				} else if (err) {
-					res.render(
-							'admin/room/edit',
-							{
-								result : { error : err.message },
-								editForm : seneca.editForm.toHTML(common.bootstrapField)
-							}
-						);
-				} else {
-					res.render(
-						'admin/episode/edit', 
-						{ 
-							result  : { success : '创建成功！' }, 
-							editForm : seneca.editForm.toHTML(common.bootstrapField)
+				res.render(
+						'admin/room/create',
+						{
+							result : err ? {error:err.message} : {success:'更新成功！'},
+							createForm : result.toHTML ? result.toHTML(common.bootstrapField) : seneca.editForm.toHTML(common.bootstrapField)
 						}
-					);					
-				}
+					);
 			});
 	}
 

@@ -7,6 +7,9 @@ function roomError() {
 	this.RoomNotExist	= function(detail){
 		return eraro('RoomNotExist', 'Room : <%=roomId%> dose not exist!', detail);
 	}
+	this.InvalidOperate = function(detail){
+		return eraro('InvalidOperate', 'Invalid operate : <%=operate %>', detail);
+	}
 
 	return this;
 }

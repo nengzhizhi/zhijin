@@ -11,7 +11,6 @@
                   <th>房间状态</th>
                   <th>当前分期</th>
                   <th>所属节目</th>
-                  <th>创建时间</th>
                   <th></th>
                 </tr>
               </thead>
@@ -21,10 +20,9 @@
                     <tr>
                       <td><%- list[i].name %></td>
                       <td><%- list[i].type %></td>
-                      <td><%- list[i].state %></td>
-                      <td><%- list[i].playing %></td>
-                      <td><%- list[i].playing %></td>
-                      <td><%- list[i].created %></td>
+                      <td><%- list[i].status %></td>
+                      <td><%- list[i].episode.name?list[i].episode.name:'' %></td>
+                      <td><%- list[i].episode.program?list[i].episode.program.name:'' %></td>
                       <td><a href="/room/detail?id=<%- list[i].id %>">房间详情</a></td>
                     </tr>
                 <% } %>

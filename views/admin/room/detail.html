@@ -20,19 +20,22 @@ td{
                   <th>房间类型：</th><td><%- room.type %></td>
                 </tr>
                 <tr>
-                  <th>房间状态：</th><td><%- room.status %></td>
+                  <th>房间状态：</th><td><%- room.status=='playing' ? "正在播放" : "暂停播放" %></td>
                 </tr>
                 <tr>
-                  <th>所属节目：</th><td><%- room.episode&&room.episode.program?room.episode.program.name:'未选择节目' %></td>
+                  <th>码流地址：</th><td><%- room.stream %></td>
+                </tr>                
+                <tr>
+                  <th>所属节目：</th><td><%- room.episode&&room.episode.program ? room.episode.program.name : '未选择节目' %></td>
                 </tr>
                 <tr>
-                  <th>当前分期：</th><td><%- room.episode&&room.episode.name?room.episode.name:'未选择分期' %></td>
+                  <th>当前分期：</th><td><%- room.episode&&room.episode.name ? room.episode.name : '未选择分期' %></td>
                 </tr>
                 <tr>
-                  <th>当前选手：</th><td><%- room.episode&&room.episode.actors?room.episode.actors:'' %></td>
+                  <th>当前选手：</th><td><%- room.episode&&room.episode.actors ? room.episode.actors : '' %></td>
                 </tr>
                 <tr>
-                  <th>互动道具：</th><td><%- room.episode&&room.episode.props?room.episode.props:'' %></td>
+                  <th>互动道具：</th><td><%- room.episode&&room.episode.props ? room.episode.props : '' %></td>
                 </tr>                       
               </tbody>
             </table>       
