@@ -15,14 +15,13 @@
                 </tr>
               </thead>
               <tbody>
-                <% console.log(list.length) %>
                 <% for(var i = 0; i < list.length; i++ ){ %>
                     <tr>
                       <td><%- list[i].name %></td>
                       <td><%- list[i].type %></td>
                       <td><%- list[i].status %></td>
-                      <td><%- list[i].episode.name?list[i].episode.name:'' %></td>
-                      <td><%- list[i].episode.program?list[i].episode.program.name:'' %></td>
+                      <td><%- list[i].episode&&list[i].episode.name?list[i].episode.name:'' %></td>
+                      <td><%- list[i].episode&&list[i].episode.program?list[i].episode.program.name:'' %></td>
                       <td><a href="/room/detail?id=<%- list[i].id %>">房间详情</a></td>
                     </tr>
                 <% } %>

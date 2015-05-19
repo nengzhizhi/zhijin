@@ -2,6 +2,9 @@ var express= require('express');
 var ejs = require('ejs');
 var seneca = require('seneca')();
 var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
+
+mongoose.connect('mongodb://zhijin:b933defa@112.124.117.146:27017/zhijin');
 
 seneca.use(
 	'mongo-store',

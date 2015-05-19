@@ -1,3 +1,5 @@
+var actorModel = require('./model.js').actorModel;
+
 module.exports = function (options) {
 	var seneca = this;
 
@@ -6,32 +8,29 @@ module.exports = function (options) {
 	seneca.add({role:'actor',cmd:'delete'},	cmd_delete);
 
 	function cmd_create(args, callback){
-		var actor = seneca.make$('actor');
+		var instance = new actorModel();
+		instance.name = args.data.name;
+		instance.avatar = args.data.avatar;
+		instance.program = args.data.program;
 
-		actor.name = args.data.name;
-		actor.avatar = args.data.avatar;
-		actor.program = args.data.program;
-
-		actor.save$(function (err, actor){
-			callback(err, actor);
-		})
-	}
-
-	function cmd_list(args, callback){
-		var collection = seneca.make$('actor');
-
-		collection.list$(args.data, function (err, actors){
-			callback(err, actors);
+		instance.save(function (err){
+			callback(err, instance);
 		});
 	}
 
-	function cmd_delete(args, callback) {
-		var collection = seneca.make$('actor');
-
-		collection.remove$({id:args.data.id}, function (err, entity){
-			callback(err, entity);
-		})
+	function cmd_list(args, callback){
+		actorModel
+		.find(args.data)
+		.exec(function (err, actor){
+			callback(err, actor);
+		});		
 	}
 
-	return { name : 'actor' };
+	function cmd_delete(args, callback) {
+		actorModel
+		.where()
+		.findOneAndRemove({_id:args.data.id}, callback);
+	}
+
+	return { name : 'actor' }
 }

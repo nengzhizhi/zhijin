@@ -73,7 +73,7 @@ module.exports = function (options) {
 						next(error.InvalidOperate({operate:'[create room]'}), null);
 					}
 				}, function (form, next) {
-					seneca.act({role:'room',cmd:'create','data':form.data}, function (err, result){
+					seneca.act({role:'room',cmd:'create',data:form.data}, function (err, result){
 						next(err, result);
 					});					
 				}
@@ -81,7 +81,7 @@ module.exports = function (options) {
 				res.render(
 						'admin/room/create',
 						{
-							result : err?{error:err.message}:{success:'创建成功！'},
+							result : err ? {error:err.message} : {success:'创建成功！'},
 							createForm : result.toHTML?result.toHTML(common.bootstrapField):seneca.createForm.toHTML(common.bootstrapField)
 						}
 					);
@@ -103,7 +103,7 @@ module.exports = function (options) {
 	function onEdit(req, res) {
 		async.series({
 			room : function (next) {
-				seneca.act({role:'room',cmd:'get',data:{id:req.query.id}}, function (err, room){
+				seneca.act({role:'room',cmd:'get',data:{_id:req.query.id}}, function (err, room){
 					next(err, room);
 				});
 			},
@@ -138,8 +138,8 @@ module.exports = function (options) {
 					label: '选择分期：',
 					widget: widgets.select(),
 					choices: result.episode.episodes,
-					value: result.room.episode ? result.room.episode : 0
-				}),
+					value: result.room.episode ? result.room.episode.id : 0
+				}),			
 				'stream':fields.string({
 					label: '码流地址：',
 					required: validators.required('请输入码流地址！'),
@@ -158,7 +158,7 @@ module.exports = function (options) {
 	function onDetail(req, res){
 		async.series({
 			room : function (next) {
-				seneca.act({role:'room',cmd:'get',data:{id:req.query.id}}, function (err, room){
+				seneca.act({role:'room',cmd:'get',data:{_id:req.query.id}}, function (err, room){
 					next(err, room);
 				});
 			}

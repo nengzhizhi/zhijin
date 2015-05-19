@@ -4,6 +4,7 @@ var fields = forms.fields;
 var validators = forms.validators;
 var widgets = forms.widgets;
 var common = require('../common/index.js');
+var error = require('./programError.js')();
 
 module.exports = function (options) {
 	var seneca = this;
@@ -39,6 +40,7 @@ module.exports = function (options) {
 			'logo': fields.string({
 				widget: widgets.file(),
 				required: validators.required('请上传节目logo！'),
+				errorAfterField: true,
 				label: '节目图片：'
 			}),
 			'description': fields.string({
@@ -60,48 +62,29 @@ module.exports = function (options) {
 		async.waterfall([
 				function (next) {
 					if (seneca.programForm) {
-						seneca.programForm.handle(req,{
+						seneca.programForm.handle(req, {
 							success: function (form){
 								next(null, form);
 							},
 							other: function (form){
-								//FIXME
-								next("Invalid input", form);
+								next(error.InvalidInput(), form);
 							}
 						})
 					} else {
-						next("Invalid input", null);
+						next(error.InvalidOperate({operate:'[create program]'}), null);
 					}
 			}, function (form, next) {
 				seneca.act({role:'program',cmd:'createProgram',data:form.data}, function (err, result){
 					next(err, result);
 				})
 			}], function (err, result){
-				if ( err == "Invalid input") {
-					res.render(
-						'admin/program/create', 
-						{ 
-							result:{ error:err }, 
-							form:result.toHTML(common.bootstrapField)
+				res.render(
+						'admin/program/create',
+						{
+							result : err ? {error:err.message} : {success:'创建成功！'},
+							form : result.toHTML ? result.toHTML(common.bootstrapField) : seneca.programForm.toHTML(common.bootstrapField)
 						}
-					);				
-				} else if (err) {
-					res.render(
-						'admin/program/create', 
-						{ 
-							result:{ error:err }, 
-							form:seneca.createForm.toHTML(common.bootstrapField)
-						}
-					);							
-				} else {
-					res.render(
-						'admin/program/create', 
-						{ 
-							result:{'success':'创建成功！'}, 
-							form:seneca.createForm.toHTML(common.bootstrapField)
-						}
-					);				
-				}
+					)
 			});
 	}
 
@@ -168,10 +151,9 @@ module.exports = function (options) {
 	}
 
 	function onEpisodeList(req, res){
-		var collection = this.make$('episode');
-		collection.list$({}, function (err, episodes){
-			res.render('admin/episode/list', {list:episodes});
-		});
+		seneca.act({role:'program',cmd:'listEpisode',data:{}}, function (err, result){
+			res.render('admin/episode/list', { list : result });
+		});		
 	}
 
 	function onEpisodeEdit(req, res){
@@ -180,8 +162,8 @@ module.exports = function (options) {
 
 		async.series({
 			episode : function(next){
-				seneca.act({role:'program',cmd:'getEpisode',data:{id:req.query.id}}, function (err,result){
-					programId = result.program.id;
+				seneca.act({role:'program',cmd:'getEpisode',data:{_id:req.query.id}}, function (err,result){
+					programId = result.program ? result.program.id : null;
 					episode = result;
 					next(err, result);
 				});
@@ -265,7 +247,7 @@ module.exports = function (options) {
 	function onEpisodeDetail(req, res){
 		async.series([
 			function (next){
-				seneca.act({role:'program',cmd:'getEpisode',data:{id:req.query.id}}, function (err, episode){
+				seneca.act({role:'program',cmd:'getEpisode',data:{_id:req.query.id}}, function (err, episode){
 					next(err, episode);
 				});
 			}	
@@ -283,48 +265,26 @@ module.exports = function (options) {
 								next(null, form);
 							},
 							other: function (form){
-								//FIXME
-								next("Invalid input", form);
+								next(error.InvalidInput(), form);
 							}
 						});
-					}
-				}, function (form, next) {
-					seneca.act({role:'program',cmd:'getProgram',data:{id:form.data.program}}, function (err, result){
-						form.data.program = result;
-						next(err, form);
-					});
+					} else {
+						next(error.InvalidOperate({operate:'[create program]'}), null);
+					}			
 				}, function (form, next) {
 					seneca.act({role:'program',cmd:'createEpisode',data:form.data}, function (err, result){
 						next(err, result);
-					});
+					});					
 				}
 			], function (err, result){
-				if ( err == "Invalid input") {
-					res.render(
-						'admin/episode/create', 
-						{ 
-							result:{ error:err }, 
-							form:result.toHTML(common.bootstrapField)
+				res.render(
+						'admin/episode/create',
+						{
+							result : err ? {error:err.message} : {success:'创建成功！'},
+							form : result.toHTML ? result.toHTML(common.bootstrapField) : seneca.episodeForm.toHTML(common.bootstrapField)
 						}
-					);				
-				} else if (err) {
-					res.render(
-						'admin/episode/create', 
-						{ 
-							result:{ error:err }, 
-							form:seneca.episodeForm.toHTML(common.bootstrapField)
-						}
-					);							
-				} else {
-					res.render(
-						'admin/episode/create', 
-						{ 
-							result:{'success':'创建成功！'}, 
-							form:seneca.episodeForm.toHTML(common.bootstrapField)
-						}
-					);				
-				}				
-			})
+					)				
+			});
 	}
 
 	function onEpisodeUpdate(req, res) {
@@ -336,11 +296,11 @@ module.exports = function (options) {
 							next(null, form);
 						},
 						other : function(form){
-							next("Invalid input", form);
+							next(error.InvalidInput(), form);
 						}
 					});
 				} else {
-					next("Invalid input1", null);
+					next(error.InvalidOperate({operate:'[update episode]'}), null);
 				}
 			},
 			function (form, next) {
@@ -349,31 +309,13 @@ module.exports = function (options) {
 				});
 			}
 		], function (err, result){
-			if ( err == "Invalid input") {
-				res.render(
-					'admin/episode/edit', 
-					{ 
-						result:{ error:err }, 
-						editForm:result.toHTML(common.bootstrapField)
+			res.render(
+					'admin/episode/update',
+					{
+						result : err ? {error:err.message} : {success:'更新成功！'},
+						form : result.toHTML ? result.toHTML(common.bootstrapField) : seneca.episodeEditForm.toHTML(common.bootstrapField)
 					}
-				);				
-			} else if (err) {
-				res.render(
-					'admin/episode/edit', 
-					{ 
-						result:{ error:err }, 
-						editForm:seneca.episodeEditForm.toHTML(common.bootstrapField)
-					}
-				);							
-			} else {
-				res.render(
-					'admin/episode/edit', 
-					{ 
-						result:{'success':'创建成功！'}, 
-						editForm:seneca.episodeEditForm.toHTML(common.bootstrapField)
-					}
-				);				
-			}
+				)
 		});
 	}
 

@@ -16,7 +16,7 @@
           <% } %>
 
           <div class="row placeholders">
-            <form class="form-horizontal" action="/program/doCreate" method="post" enctype="multipart/form-data">
+            <form class="form-horizontal" action="/program/doCreate" method="post">
               <%-form %>
               <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-4">
@@ -40,7 +40,7 @@ $('#fileupload').fileupload({
     $.each(data.result.files, function (index, file) {
       //$('<p/>').text(file.name).appendTo('#files');
       //$('#result').text('上传成功！');
-      $('#avatar').val(file.url);
+      $('#logo').val(file.url);
     });
   },
   progressall: function (e, data) {

@@ -227,7 +227,7 @@ function fileUpload(){
                 fs.unlink(file.path);
                 return;
             }
-            fileInfo.name = UUID.v1() + fileInfo.name.split('.')[1];
+            fileInfo.name = UUID.v1() + '.' + fileInfo.name.split('.')[1];
             fs.renameSync(file.path, options.uploadDir + '/' + fileInfo.name);
             if (options.imageTypes.test(fileInfo.name)) {
                 Object.keys(options.imageVersions).forEach(function (version) {

@@ -1,3 +1,6 @@
+var programModel = require('./model.js').programModel;
+var episodeModel = require('./model.js').episodeModel;
+
 module.exports = function(options){
 	var seneca = this;
 
@@ -9,77 +12,69 @@ module.exports = function(options){
 	seneca.add({role:'program',cmd:'updateEpisode'},	cmd_updateEpisode);
 	seneca.add({role:'program',cmd:'listEpisode'},		cmd_listEpisode);
 
-
 	function cmd_createProgram(args, callback){
-		var program = seneca.make$('program');
-		program.name = args.data.name;
-		program.logo = args.data.logo;
-		program.description = args.data.description;
+		var instance = new programModel();
+		instance.name = args.data.name;
+		instance.logo = args.data.logo;
+		instance.description = args.data.description;
 
-		program.save$(function (err, entity){
-			callback(err, entity);
+		instance.save(function (err){
+			callback(err, instance);
 		});
 	}
 
-	function cmd_listProgram(args, callback) {
-		var collection = seneca.make$('program');
-
-		collection.list$(args.data, function (err, programs){
+	function cmd_listProgram(args, callback){
+		programModel
+		.find(args.data)
+		.exec( function (err, programs){
 			callback(err, programs);
 		});
 	}
 
 	function cmd_getProgram(args, callback){
-		var collection = seneca.make$('program');
-
-		collection.load$(args.data, function (err, program){
+		programModel
+		.findOne(args.data)
+		.exec( function (err, program){
 			callback(err, program);
 		});
 	}
 
-	function cmd_createEpisode(args, callback) {
-		var episode = seneca.make$('episode');
+	function cmd_createEpisode(args, callback){
+		var instance = new episodeModel();
+		instance.startTime = args.data.startTime;
+		instance.endTime = args.data.endTime;
+		instance.name = args.data.name;
+		instance.number = args.data.number;
+		instance.program = args.data.program;
 
-		episode.name = args.data.name;
-		episode.number = args.data.number;
-		episode.program = args.data.program;
-		episode.startTime = args.data.startTime;
-		episode.endTime = args.data.endTime;
-		episode.actors = [];
-		episode.props = [];
-
-		episode.save$(function (err, entity){
-			callback(err, entity);
+		instance.save(function (err){
+			callback(err, instance);
 		});
 	}
 
-	function cmd_getEpisode(args, callback) {
-		var collection = seneca.make$('episode');
-
-		collection.load$(args.data, function (err, episode){
+	function cmd_getEpisode(args, callback){
+		episodeModel
+		.findOne(args.data)
+		.populate('program')
+		.exec( function (err, episode){
 			callback(err, episode);
 		});
 	}
 
-	function cmd_updateEpisode(args, callback) {
-		var collection = seneca.make$('episode');
-
-		for(var key in args.data){
-			collection[key] = args.data[key];
-		}
-
-		collection.save$(function (err, episode){
-			callback(err, episode);
-		})
-	}
-
-	function cmd_listEpisode(args, callback) {
-		var collection = seneca.make$('episode');
-
-		collection.list$(args.data, function (err, episodes){
+	function cmd_listEpisode(args, callback){
+		episodeModel
+		.find(args.data)
+		.populate('program')
+		.exec( function (err, episodes){
 			callback(err, episodes);
-		});		
+		});
 	}
 
-	return { name : 'program' };
+	function cmd_updateEpisode(args, callback){
+		episodeModel
+		.where({_id:args.data.id})
+		.update(args.data, callback);
+	}
+
+
 }
