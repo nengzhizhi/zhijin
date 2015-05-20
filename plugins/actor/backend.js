@@ -43,6 +43,10 @@ module.exports = function (options) {
 				}),
 				'avatar': fields.string({
 					widget: widgets.file(),
+					options:{
+						buttonId:'fileupload',
+						progressId:'progress'
+					},
 					required: validators.required('请上传选手图片！'),
 					label: '选手图片：'
 				})

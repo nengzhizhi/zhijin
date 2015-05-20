@@ -18,7 +18,7 @@
                 <% for(var i = 0; i < list.length; i++ ){ %>
                     <tr>
                       <td><%- list[i].name %></td>
-                      <td><%- list[i].type %></td>
+                      <td><%- list[i].type=='individual' ? "个人房间" : "官方房间"%></td>
                       <td><%- list[i].status %></td>
                       <td><%- list[i].episode&&list[i].episode.name?list[i].episode.name:'' %></td>
                       <td><%- list[i].episode&&list[i].episode.program?list[i].episode.program.name:'' %></td>

@@ -3,6 +3,7 @@ var mongoose = require('mongoose')
 ,ObjectId = Schema.ObjectId;
 
 var programModel = require('../program/model.js').programModel;
+var roomModel = require('../room/model.js').roomModel;
 
 var propSchema = new Schema({
 	name : String,
@@ -11,8 +12,36 @@ var propSchema = new Schema({
 		type	: Schema.Types.ObjectId,
 		ref : 'program'
 	},
-	countdown : Schema.Types.Mixed,
-	menu :Schema.Types.Mixed
+	countdown : {
+		buy : Number,
+		endBuy : Number,
+		use : Number,
+		endUse : Number
+	},
+	menu : {
+		options : []
+	}
+});
+
+var interactionSchema = new Schema({
+	prop : {
+		type : Schema.Types.ObjectId,
+		ref : 'prop'
+	},
+	room : {
+		type : Schema.Types.ObjectId,
+		ref : 'room'
+	},
+	countdown : {
+		buy : Number,
+		endBuy : Number,
+		use : Number,
+		endUse : Number
+	},
+	status : Boolean,
+	actors : [],
+	result : {}
 });
 
 exports.propModel = mongoose.model('prop', propSchema);
+exports.interactionModel = mongoose.model('interaction', interactionSchema);

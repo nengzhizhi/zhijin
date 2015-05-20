@@ -106,17 +106,17 @@ function bootstrapField(name, object) {
                       '<i class="glyphicon glyphicon-plus"></i>' +
                       '<span>选择文件..</span>' +
                       '<input id="' + name +'" name="' + name + '" type="hidden">' +
-                      '<input id="fileupload" type="file">' +
+                      '<input id="' + object.options.buttonId + '" type="file">' +
                   '</span>' +              
                 '</div>'  + error + '</div>' +
               '<div class="form-group">' +
                 '<label for="id_name" class="control-label col-sm-2"></label>' +
                 '<div class="col-sm-4">' +
-                  '<div id="progress" class="progress">' +
+                  '<div id="' + object.options.progressId + '" class="progress">' +
                       '<div class="progress-bar progress-bar-success progress-bar-striped"></div>' +
                   '</div>' +
                 '</div>' + 
-              '</div>';                
+              '</div>';
         return html;
 	} else {
 		return '<div class="form-group ' + validationclass + '">' + label + '<div class="col-sm-4">' + widget + '</div>' + error + '</div>';	

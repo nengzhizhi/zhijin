@@ -310,10 +310,10 @@ module.exports = function (options) {
 			}
 		], function (err, result){
 			res.render(
-					'admin/episode/update',
+					'admin/episode/edit',
 					{
 						result : err ? {error:err.message} : {success:'更新成功！'},
-						form : result.toHTML ? result.toHTML(common.bootstrapField) : seneca.episodeEditForm.toHTML(common.bootstrapField)
+						editForm : result.toHTML ? result.toHTML(common.bootstrapField) : seneca.episodeEditForm.toHTML(common.bootstrapField)
 					}
 				)
 		});

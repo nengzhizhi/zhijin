@@ -1,0 +1,83 @@
+<% include ../header.html %>
+<style type="text/css">
+td{
+  text-align: center;
+  vertical-align: middle;
+}
+</style>
+<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+  	<h4 class="page-header">房间管理&nbsp;>&nbsp;互动管理</h4>
+	<div class="row placeholders" style="text-align:left">
+		<a href="#" class="btn btn-success btn-lg" data-toggle="modal" data-target="#interaction">创建互动</a>
+	</div>
+
+
+	<div class="row placeholders">
+	<table class="table table-striped">
+	  <thead>
+	    <tr>
+	      <th>道具名称</th>
+	      <th>互动状态</th>
+	      <th></th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	    <% for(var i = 0; i < room.interactions.length; i++ ){ %>
+	        <tr>
+	          <td><%- room.interactions[i].prop.name %></td>
+	          <td><%- room.interactions[i].result ? "已结束" : room.interactions[i].status ? "进行中" : "暂停中" %></td>
+	          <td>
+	          	<% if(room.interactions[i].result){ %>
+	          		<a href="#" class="btn btn-primary"></a>
+	          	<% } else if(room.interactions[i].status) { %>
+		          	<a href="/interaction/stop?interactionId=<%-room.interactions[i].id %>&roomId=<%-room.id %>" class="btn btn-danger">暂停互动</a>
+	          	<% } else { %>
+	          		<a href="/interaction/start?interactionId=<%-room.interactions[i].id %>&roomId=<%-room.id %>" class="btn btn-success">开启互动</a>
+	          	<% } %>
+	          </td>
+	        </tr>
+	    <% } %>
+	  </tbody>
+	</table>       
+	</div>
+</div>  
+<% include ../footer.html %>
+
+<!-- 创建互动面板 -->
+<div class="modal fade" id="interaction" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">创建互动</h4>
+      </div>
+      <div class="modal-body">
+      	<table class="table table-bordered">
+      		<% for(var i=0;i<room.props.length;i++){ %>
+      			<tr>
+      				<form action="/interaction/create" method="post">
+	      				<td><%- room.props[i].name %></td>
+	      				<td>
+	      					<% for(var j=0;j<room.actors.length;j++){ %>
+		      					<label class="checkbox-inline">
+								  <input type="checkbox" name="actors" value="<%- room.actors[j].id %>">
+								  <%- room.actors[j].name %>
+								</label>
+							<% } %>
+	      				</td>
+	      				<td>
+	      					<input type="hidden" name="roomId" value="<%-room.id %>">
+	      					<input type="hidden" name="propId" value="<%-room.props[i].id %>">
+	      					<button type="submit" class="btn btn-success">创建互动</button>
+	      				</td>
+      				</form>
+      			</tr>
+      		<% } %>
+      	</table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>

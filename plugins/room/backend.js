@@ -24,6 +24,7 @@ module.exports = function (options) {
 					app.get('/room/detail', onDetail);
 					app.get('/room/edit', onEdit);
 					app.post('/room/update', onUpdate);
+					app.get('/room/interaction', onInteraction);
 				})
 			});
 
@@ -156,14 +157,42 @@ module.exports = function (options) {
 	}
 
 	function onDetail(req, res){
-		async.series({
-			room : function (next) {
+		async.waterfall([
+			function (next) {
 				seneca.act({role:'room',cmd:'get',data:{_id:req.query.id}}, function (err, room){
 					next(err, room);
 				});
+			}, function (room, next) {
+				if (room.episode) {
+					var actorIds = [];
+					for (var i=0;i<room.episode.actors.length;i++) {
+						actorIds.push({_id:room.episode.actors[i]});
+					}
+
+					seneca.act({role:'actor',cmd:'list',data:actorIds}, function (err, actors){
+						room.actors = actors;
+						next(err, room);
+					});					
+				} else {
+					next(null, room);
+				}
+			}, function (room, next) {
+				if (room.episode) {
+					var propIds = [];
+					for (var i=0;i<room.episode.props.length;i++) {
+						propIds.push({_id:room.episode.props[i]});
+					}
+
+					seneca.act({role:'prop',cmd:'listProp',data:propIds}, function (err, props){
+						room.props = props;
+						next(err, room);
+					});
+				} else {
+					next(null, room);
+				}
 			}
-		}, function (err, result){
-			res.render('admin/room/detail', { 'room':result.room });
+		], function (err, result){
+			res.render('admin/room/detail', { 'room' : result });
 		});
 	}
 
@@ -196,6 +225,51 @@ module.exports = function (options) {
 						}
 					);
 			});
+	}
+
+	function onInteraction(req, res) {
+		async.waterfall([
+			function (next) {
+				seneca.act({role:'room',cmd:'get',data:{_id:req.query.id}}, function (err, room){
+					next(err, room);
+				});
+			}, function (room, next) {
+				if (room.episode) {
+					var actorIds = [];
+					for (var i=0;i<room.episode.actors.length;i++) {
+						actorIds.push({_id:room.episode.actors[i]});
+					}
+
+					seneca.act({role:'actor',cmd:'list',data:actorIds}, function (err, actors){
+						room.actors = actors;
+						next(err, room);
+					});					
+				} else {
+					next(null, room);
+				}
+			}, function (room, next) {
+				if (room.episode) {
+					var propIds = [];
+					for (var i=0;i<room.episode.props.length;i++) {
+						propIds.push({_id:room.episode.props[i]});
+					}
+
+					seneca.act({role:'prop',cmd:'listProp',data:propIds}, function (err, props){
+						room.props = props;
+						next(err, room);
+					});
+				} else {
+					next(null, room);
+				}
+			}, function (room, next) {
+				seneca.act({role:'prop',cmd:'listInteraction',data:{room:req.query.id}}, function (err, interactions){
+					room.interactions = interactions;
+					next(err, room);
+				});
+			}
+		], function (err, result){
+			res.render('admin/room/interaction', { room : result });
+		});
 	}
 
 	return { name : 'backend' };

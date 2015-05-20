@@ -1,92 +1,70 @@
 var async = require('async');
+var propModel = require('./model.js').propModel;
+var interactionModel = require('./model.js').interactionModel;
 
-module.exports = function(options) {
+module.exports = function (options) {
 	var seneca = this;
 	//此数据需要共享
-	seneca.countdownHandle = [];
+	seneca.countdownHandle = [];	
 
-	//开启互动 for power card
-	seneca.add({role:'prop',cmd:'createProp'},			cmd_createProp);
-	seneca.add({role:'prop',cmd:'listProp'},			cmd_listProp);
-	seneca.add({role:'prop',cmd:'createInteraction'},	cmd_createInteraction);
-	seneca.add({role:'prop',cmd:'startInteraction'},	cmd_startInteraction);
-	seneca.add({role:'prop',cmd:'stopInteraction'},		cmd_stopInteraction);
-	//seneca.add({role:'prop',cmd:'claerInteraction'},	cmd_clearInteraction);
+	seneca.add({role:'prop', cmd:'createProp'}, cmd_createProp);
+	seneca.add({role:'prop', cmd:'listProp'}, cmd_listProp);
+	seneca.add({role:'prop', cmd:'createInteraction'}, cmd_createInteraction);
+	seneca.add({role:'prop', cmd:'startInteraction'}, cmd_startInteraction);
+	seneca.add({role:'prop', cmd:'stopInteraction'}, cmd_stopInteraction);
+	seneca.add({role:'prop', cmd:'listInteraction'}, cmd_listInteraction);
+
 
 	function cmd_createProp(args, callback){
-		var prop = seneca.make$('prop');
-
-		prop.name = args.data.name;
-		prop.type = args.data.type;
-		prop.countdown = {
-			"buy" : 5,
-			"endBuy" : 5,
-			"use" : 5,
-			"endUse" : 5		
-		};
-		prop.menu = {
-			"options" : [
-				{
-					"name" : "xxxxx",
-					"icon" : "http://xxxx.png"
-				}
-			]		
+		var instance = new propModel();
+		instance.name = args.data.name;
+		instance.type = args.data.type;
+		instance.program = args.data.program;
+		instance.countdown.buy = args.data.buy;
+		instance.countdown.endBuy = args.data.endBuy;
+		instance.countdown.use = args.data.use;
+		instance.countdown.endUse = args.data.endUse;
+		var option = {
+			name : args.data.option_name,
+			image : args.data.options_image
 		}
+		instance.menu.options.push(option);
 
-		prop.save$(function (err, entity){
-			callback(err, entity);
+		instance.save(function (err){
+			callback(err, instance);
 		});
 	}
 
 	function cmd_listProp(args, callback){
-		var collection = seneca.make$('prop');
-
-		collection.list$(args.data, function (err, props){
+		propModel
+		.find(args.data)
+		.populate('program')
+		.exec( function (err, props){
 			callback(err, props);
 		});
 	}
 
 	function cmd_createInteraction(args, callback){
-		var propId = args.data.propId;
-		var roomId = args.data.roomId;
-		var actors = args.data.actors;
-
-		//TODO check input
-
 		async.waterfall([
 			function (next) {
-				var collection = seneca.make$('interaction');
-
-				collection.load$({roomId:roomId, status:true}, function (err, interaction){
-					console.log(interaction);
-					if (interaction) {
-						next("Room already has an interaction!", null);
-					} else {
-						next(null, interaction);
-					}
-				})
-			},function (interaction, next) {
-				var collection = seneca.make$('prop');
-
-				collection.load$({id:propId}, function (err, prop){
-					if (!prop) {
-						next("prop not exist!", null);
-					} else {
-						next(null, prop);
-					}
+				propModel
+				.findOne({_id:args.data.propId})
+				.populate('program')
+				.exec( function (err, prop) {
+					console.log(prop);
+					next(err, prop);
 				});
-			},function (prop, next) {
-				var interaction = seneca.make$('interaction');
-	
-				interaction.prop = prop;
-				interaction.roomId = roomId;
-				interaction.countdown = prop.countdown;
-				interaction.status = true;
-				interaction.actors = actors;
-				interaction.menu = prop.menu;
-				interaction.result = {};
-				interaction.save$(function (err, interaction){
-					next(err, interaction);
+			}, function (prop, next) {
+				var instance = new interactionModel();
+				instance.prop = args.data.propId;
+				instance.room = args.data.roomId;
+				instance.countdown = prop.countdown;
+				instance.status = true;
+				instance.actors = args.data.actors;
+				instance.result = {}
+
+				instance.save(function (err) {
+					next(err, instance);
 				});
 			}
 		], function (err, result){
@@ -98,13 +76,15 @@ module.exports = function(options) {
 		var interactionId = args.data.interactionId;
 
 		async.waterfall([
-			function (next){
-				var collection = seneca.make$('interaction');
-
-				collection.load$({id:interactionId}, function (err, interaction) {
+			function (next) {
+				interactionModel
+				.findOne({_id:interactionId})
+				.populate('room')
+				.populate('prop')
+				.exec( function (err, interaction){
 					next(err, interaction);
-				});
-			}, function (interaction, next) {
+				})		
+			}, function (interaction, next){
 				if (interaction) {
 					interaction.status = true;
 
@@ -127,7 +107,6 @@ module.exports = function(options) {
 
 						console.log('interaction = ' + interaction + '\r\n');
 					}, 1000);
-
 					next(null, null);
 				} else {
 					next("interaction dose not exist!", null);
@@ -142,30 +121,40 @@ module.exports = function(options) {
 		var interactionId = args.data.interactionId;
 
 		async.waterfall([
-				function (next) {
-					var collection = seneca.make$('interaction');
-
-					collection.load$({id:interactionId}, function (err, interaction){
-						next(err, interaction);
-					});
-				}, function (interaction, next){
-					if (!interaction){
-						next("can't find interaction");
-					} else {
-						if (interaction.status) {
-							clearInterval(seneca.countdownHandle[interaction.id]);
-							interaction.status = false;
-							interaction.save$(function (err, entity){
-								next(err, entity);
-							});
-						}
-						next(null, null);
+			function (next) {
+				interactionModel
+				.findOne({_id:interactionId})
+				.populate('room')
+				.populate('prop')
+				.exec( function (err, interaction){
+					next(err, interaction);
+				})					
+			}, function (interaction, next) {
+				if (!interaction){
+					next("can't find interaction", null);
+				} else {
+					if (interaction.status) {
+						clearInterval(seneca.countdownHandle[interaction.id]);
+						interaction.status = false;
+						interaction.save(function (err){
+							next(err, interaction);
+						});
 					}
-				}
-			], function (err, result){
-				callback(err, result);
-			});
+					next(null, null);
+				}					
+			}
+		], function (err, result){
+			callback(err, result);
+		});
 	}
 
-	return { name : 'prop' };
+	function cmd_listInteraction(args, callback){
+		interactionModel
+		.find(args.data)
+		.populate('room')
+		.populate('prop')
+		.exec( function (err, interactions) {
+			callback(err, interactions);
+		})
+	}
 }

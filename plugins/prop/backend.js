@@ -1,5 +1,11 @@
+var async = require('async');
+var forms = require('forms');
 var fs = require('fs');
+var fields = forms.fields;
+var validators = forms.validators;
+var widgets = forms.widgets;
 var formidable = require('formidable');
+var common = require('../common/index.js');
 
 module.exports = function (options) {
 	var seneca = this;
@@ -7,83 +13,186 @@ module.exports = function (options) {
 
 	this.act('role:web', {use:router(function (app){
 			app.get('/prop/create', onCreateProp);
+			app.get('/prop/list', onPropList);
 			app.post('/prop/doCreate', onDoCreateProp);
 			app.get('/interaction/list', onInteractionList);
+			app.post('/interaction/create', onCreateInteraction);
+			app.get('/interaction/start', onStartInteraction);
+			app.get('/interaction/stop', onStopInteraction);
 		})
 	});
 
 
-	function onCreateProp(req, res) {
-		var collection = seneca.make$('program');
+	function onCreateProp (req, res) {
+		async.waterfall([
+				function (next) {
+					seneca.act({role:'program',cmd:'listProgram'}, function (err, programs){
+						next(err, programs);
+					});
+				}
+			], function (err, result){
+				var programs = {};
+				for(var i=0;i<result.length;i++){
+					programs[result[i].id] = result[i].name;
+				}
 
-		collection.list$({}, function (err, programs){
-			res.render('admin/prop/create', { result:'', 'programs':programs});
+				seneca.propForm = forms.create({
+					'name' : fields.string({
+						required : validators.required('请输入道具名称'),
+						label : '道具名称：'
+					}),
+					'logo' : fields.string({
+						label : '道具图片：',
+						widget : widgets.file(),
+						options : {
+							buttonId : 'aaa',
+							progressId : 'bbb'
+						}
+					}),
+					'type' : fields.string({
+						label : '道具类型：',
+						widget : widgets.select(),
+						choices : {
+							privilege : '权限型'
+						}
+					}),
+					'program' : fields.string({
+						label : '所属节目：',
+						widget : widgets.select(),
+						choices : programs
+					}),
+					'buy' : fields.number({
+						label : '倒计时/购买时间：'
+					}),
+					'endBuy' : fields.number({
+						label : '倒计时/购买结果：'
+					}),
+					'use' : fields.number({
+						label : '倒计时/使用时间：'
+					}),
+					'endUse' : fields.number({
+						label : '倒计时/使用结果：'
+					})
+				});
+
+				res.render(
+					'admin/prop/create',
+					{
+						result : '',
+						createForm : seneca.propForm.toHTML(common.bootstrapField)
+					}
+				)
 		});
 	}
 
-	function onDoCreateProp(req, res){
-		var form = new formidable.IncomingForm();
-		form.encoding = 'utf-8';        //设置编辑
-		form.keepExtensions = true;     //保留后缀
-		form.maxFieldsSize = 2 * 1024 * 1024;   //文件大小
-		form.uploadDir = 'public/upload/';
-
-		form.parse(req, function (err, fields, files) {
-			if (err) {
-				res.render('admin/prop/create', {result:{'error':err}});
-				return;				
+	function onPropList (req, res) {
+		async.waterfall([
+			function (next) {
+				seneca.act({role:'prop',cmd:'listProp',data:{}}, function (err, props){
+					next(err, props);
+				})
 			}
-
-			//TODO 所有图片仅支持png格式
-			var imgUrl = form.uploadDir + Math.random() + '.png';
-			fs.renameSync(files.img.path, imgUrl); 
-
-			var prop = seneca.make$('prop');
-			prop.name = fields.name;
-			prop.imgUrl = imgUrl;
-			prop.program = fields.program;
-			prop.type = fields.type;
-			prop.voteStage = [];
-			if(files.icon_1.size && fields.number_1){
-				var stage_1 = {
-					number : fields.number_1,
-					icon : form.uploadDir + Math.random() + '.png'
-				}
-				fs.renameSync(files.icon_1.path, stage_1.icon);
-				prop.voteStage.push(stage_1);
-			}
-			if(files.icon_2.size && fields.number_2){
-				var stage_2 = {
-					number : fields.number_2,
-					icon : form.uploadDir + Math.random() + '.png'
-				}
-				fs.renameSync(files.icon_2.path, stage_2.icon);
-				prop.voteStage.push(stage_2);
-			}
-
-			if(files.icon_3.size && fields.number_3){
-				var stage_3 = {
-					number : fields.number_3,
-					icon : form.uploadDir + Math.random() + '.png'
-				}
-				fs.renameSync(files.icon_3.path, stage_3.icon);
-				prop.voteStage.push(stage_3);
-			}
-			prop.save$(function (err, prop){
-				if (prop.id) {
-					res.render('admin/prop/create', {result:{'success':'创建成功！'}});
-					return;						
-				}
-			});
-			return;		
+		], function (err, result){
+			res.render('admin/prop/list', {list:result} );
 		});
+	}
+
+	function onDoCreateProp (req, res) {
+		async.waterfall([
+				function (next) {
+					if (seneca.propForm) {
+						seneca.propForm.handle(req, {
+							success : function (form) {
+								next(null, form);
+							},
+							other : function (form) {
+								next(null, form);
+							}
+						})
+					} else {
+						next(null, null);
+					}
+				}, function (form, next) {
+					seneca.act({role:'prop',cmd:'createProp',data:form.data}, function (err, result){
+						next(err, result);
+					});
+				}
+			], function (err, result){
+				res.render(
+						'admin/prop/create',
+						{
+							result : err ? { error : err.message } : { success : '创建成功！' },
+							createForm : result.toHTML ? result.toHTML(common.bootstrapField) : seneca.propForm.toHTML(common.bootstrapField)
+						}
+					)
+			});
 	}
 
 	function onInteractionList(req ,res){
-		var collection = this.make$('interaction');
-		collection.list$({}, function (err, interactions){
-			res.render('admin/interaction/list', {list:interactions});
-		})
+		async.waterfall([
+			function (next) {
+				seneca.act({role:'prop',cmd:'listProp',data:{}}, function (err, result){
+					next(err, result);
+				});
+			}
+		], function (err, result){
+			res.render('admin/prop/list', {list:result});
+		});
+	}
+
+	function onCreateInteraction(req, res){
+		async.waterfall([
+			function (next) {
+				seneca.act({
+						role:'prop',
+						cmd:'createInteraction',
+						data:{
+							roomId : req.body.roomId,
+							propId : req.body.propId
+						}
+				}, function (err, result){
+					next(err, result);
+				})
+			}, function (result, next) {
+				console.log(result);
+				seneca.act({
+					role:'prop',
+					cmd:'startInteraction',
+					data:{
+						//interactionId:req.query.interactionId
+						interactionId : result.id
+					}
+				}, function (err, result){
+					next(err, result);
+				});				
+			}
+		], function (err, result){
+			res.redirect('/room/interaction?id=' + req.body.roomId);	
+		});
+	}
+
+	function onStartInteraction(req, res){
+		seneca.act({
+				role:'prop',
+				cmd:'startInteraction',
+				data:{
+					interactionId:req.query.interactionId
+				}
+			}, function (err, result){
+				res.redirect('/room/interaction?id=' + req.query.roomId);	
+		});
+	}
+
+	function onStopInteraction(req, res){
+		seneca.act({
+				role:'prop',
+				cmd:'stopInteraction',
+				data:{
+					interactionId:req.query.interactionId
+				}
+			}, function (err, result){
+				res.redirect('/room/interaction?id=' + req.query.roomId);	
+		});
 	}
 
 	return { name : 'backend' };
