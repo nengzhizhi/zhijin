@@ -148,7 +148,8 @@ module.exports = function (options) {
 						cmd:'createInteraction',
 						data:{
 							roomId : req.body.roomId,
-							propId : req.body.propId
+							propId : req.body.propId,
+							actors : req.body.actors
 						}
 				}, function (err, result){
 					next(err, result);
@@ -184,14 +185,16 @@ module.exports = function (options) {
 	}
 
 	function onStopInteraction(req, res){
+		var roomId = req.query.roomId;
+
 		seneca.act({
-				role:'prop',
-				cmd:'stopInteraction',
-				data:{
-					interactionId:req.query.interactionId
-				}
-			}, function (err, result){
-				res.redirect('/room/interaction?id=' + req.query.roomId);	
+			role:'prop',
+			cmd:'stopInteraction',
+			data:{
+				interactionId:req.query.interactionId
+			}
+		}, function (err, result){
+			res.redirect('/room/interaction?id=' + roomId);	
 		});
 	}
 

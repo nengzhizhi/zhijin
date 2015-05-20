@@ -99,15 +99,21 @@ module.exports = function (options) {
 							interaction.countdown.endUse --;
 						} else {
 							interaction.status = false;
+							interaction.result = { result : 'success' };
 						}
 
 						if (interaction.status == false) {
 							clearInterval(seneca.countdownHandle[interaction.id]);
 						}
 
+						interaction.save();
+
 						console.log('interaction = ' + interaction + '\r\n');
 					}, 1000);
-					next(null, null);
+
+					interaction.save(function (err){
+						next(err, interaction);
+					});
 				} else {
 					next("interaction dose not exist!", null);
 				}
@@ -139,8 +145,9 @@ module.exports = function (options) {
 						interaction.save(function (err){
 							next(err, interaction);
 						});
+					} else {
+						next(null, null);
 					}
-					next(null, null);
 				}					
 			}
 		], function (err, result){
@@ -153,6 +160,7 @@ module.exports = function (options) {
 		.find(args.data)
 		.populate('room')
 		.populate('prop')
+		.populate('actors','name')
 		.exec( function (err, interactions) {
 			callback(err, interactions);
 		})

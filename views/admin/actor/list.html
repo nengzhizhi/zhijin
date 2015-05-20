@@ -17,7 +17,7 @@
                     <tr>
                       <td><img src="<%- list[i].avatar %>" style="width:100px;height:100px;"></td>
                       <td><%- list[i].name %></td>
-                      <td><%- list[i].program %></td>
+                      <td><%- list[i].program.name %></td>
                       <td><a href="/actor/delete?id=<%-list[i].id %>" class="btn btn-danger">删除</a></td>
                     </tr>
                 <% } %>

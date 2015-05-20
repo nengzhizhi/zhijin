@@ -8,6 +8,7 @@ module.exports = function (options) {
 	this.add({role:'room',cmd:'list'},		cmd_list);
 	this.add({role:'room',cmd:'create'},	cmd_create);
 	this.add({role:'room',cmd:'update'},	cmd_update);
+	this.add({role:'room',cmd:'delete'},	cmd_delete);
 
 	function cmd_get(args, callback){
 		roomModel
@@ -32,7 +33,7 @@ module.exports = function (options) {
 	function cmd_create(args, callback){
 		var instance = new roomModel();
 		instance.name = args.data.name;
-		instance.status = args.data.status;
+		instance.status = 'waiting';
 		instance.stream = args.data.stream;
 		instance.type = args.data.type;
 		instance.episode = args.data.episode;
@@ -46,5 +47,11 @@ module.exports = function (options) {
 		roomModel
 		.where({_id:args.data.id})
 		.update(args.data, callback);
+	}
+
+	function cmd_delete(args, callback){
+		roomModel
+		.where()
+		.findOneAndRemove({_id:args.data.id}, callback);
 	}
 }

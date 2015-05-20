@@ -40,6 +40,10 @@ module.exports = function (options) {
 			'logo': fields.string({
 				widget: widgets.file(),
 				required: validators.required('请上传节目logo！'),
+				options : {
+					buttonId : 'fileupload',
+					progressId : 'progress'
+				},
 				errorAfterField: true,
 				label: '节目图片：'
 			}),

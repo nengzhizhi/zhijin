@@ -4,6 +4,7 @@ var mongoose = require('mongoose')
 
 var programModel = require('../program/model.js').programModel;
 var roomModel = require('../room/model.js').roomModel;
+var actorModel = require('../actor/model.js').actorModel;
 
 var propSchema = new Schema({
 	name : String,
@@ -39,7 +40,10 @@ var interactionSchema = new Schema({
 		endUse : Number
 	},
 	status : Boolean,
-	actors : [],
+	actors : [{
+		type: Schema.Types.ObjectId,
+		ref : 'actor'
+	}],
 	result : {}
 });
 

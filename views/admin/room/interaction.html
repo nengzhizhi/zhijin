@@ -13,11 +13,22 @@ td{
 
 
 	<div class="row placeholders">
+	<table class="table table-bordered table-strip">
+		<tr>
+			<th class="col-sm-3">房间名称：</th>
+			<td><%- room.name %></td>
+		</tr>
+		<tr>
+			<th>当前分期：</th>
+			<td><%- room.episode ? room.episode.name : '' %></td>
+		</tr>
+	</table>
 	<table class="table table-striped">
 	  <thead>
 	    <tr>
 	      <th>道具名称</th>
 	      <th>互动状态</th>
+	      <th>参与选手</th>
 	      <th></th>
 	    </tr>
 	  </thead>
@@ -27,8 +38,12 @@ td{
 	          <td><%- room.interactions[i].prop.name %></td>
 	          <td><%- room.interactions[i].result ? "已结束" : room.interactions[i].status ? "进行中" : "暂停中" %></td>
 	          <td>
+	          	<% for(var j=0;j<room.actors.length;j++){ %>
+	          		<a href="#" class="label label-info"><%-room.actors[j].name %></a>
+	          	<% } %>
+	          </td>
+	          <td>
 	          	<% if(room.interactions[i].result){ %>
-	          		<a href="#" class="btn btn-primary"></a>
 	          	<% } else if(room.interactions[i].status) { %>
 		          	<a href="/interaction/stop?interactionId=<%-room.interactions[i].id %>&roomId=<%-room.id %>" class="btn btn-danger">暂停互动</a>
 	          	<% } else { %>
@@ -52,7 +67,12 @@ td{
         <h4 class="modal-title" id="myModalLabel">创建互动</h4>
       </div>
       <div class="modal-body">
-      	<table class="table table-bordered">
+      	<table class="table table-striped">
+      		<tr>
+      			<th>道具名称</th>
+      			<th>选择参与选手</th>
+      			<th></th>
+      		</tr>
       		<% for(var i=0;i<room.props.length;i++){ %>
       			<tr>
       				<form action="/interaction/create" method="post">
@@ -68,7 +88,7 @@ td{
 	      				<td>
 	      					<input type="hidden" name="roomId" value="<%-room.id %>">
 	      					<input type="hidden" name="propId" value="<%-room.props[i].id %>">
-	      					<button type="submit" class="btn btn-success">创建互动</button>
+	      					<button type="submit" class="btn btn-default">创建互动</button>
 	      				</td>
       				</form>
       			</tr>

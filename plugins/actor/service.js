@@ -21,6 +21,7 @@ module.exports = function (options) {
 	function cmd_list(args, callback){
 		actorModel
 		.find(args.data)
+		.populate('program','name')
 		.exec(function (err, actor){
 			callback(err, actor);
 		});		

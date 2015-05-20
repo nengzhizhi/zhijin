@@ -9,7 +9,7 @@ td{
           <div class="row placeholders" style="text-align:left">
             <a href="/room/edit?id=<%-room.id %>" class="btn btn-primary">编辑</a>
             <a href="/room/interaction?id=<%-room.id %>" class="btn btn-primary">房间互动管理</a>
-            <a href="#" class="btn btn-danger">删除房间</a>
+            <a href="/room/delete?id=<%-room.id %>" class="btn btn-danger">删除房间</a>
           </div>
           <div class="row placeholders">
             <table class="table table-striped">
@@ -39,28 +39,19 @@ td{
                       if(room.actors){
                         for(var i=0;i<room.actors.length;i++){
                     %>
-                      <a href="#"><%-room.actors[i].name %></a>
+                      <a href="#" class="label label-info"><%-room.actors[i].name %></a>
                     <% }} %>
                   </td>
                 </tr>
                 <tr>
                   <th>互动道具：</th>
                   <td>
-                    <table class="table table-bordered">
-                      <thead>
-                        <th>道具名称</th>
-                        <th></th>
-                      </thead>
-                      <tbody>
-                        <%  
-                          if(room.props){
-                            for(var i=0;i<room.props.length;i++){
-                        %>                        
-                        <td><%-room.props[i].name %></td>
-                        <td></td>
-                        <% }} %>
-                      </tbody>
-                    </table>
+                      <%  
+                        if(room.props){
+                          for(var i=0;i<room.props.length;i++){
+                      %>                        
+                      <a href="#" class="label label-warning"><%-room.props[i].name %></a>
+                      <% }} %>                    
                   </td>
                 </tr>                       
               </tbody>

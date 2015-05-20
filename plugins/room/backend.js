@@ -25,6 +25,7 @@ module.exports = function (options) {
 					app.get('/room/edit', onEdit);
 					app.post('/room/update', onUpdate);
 					app.get('/room/interaction', onInteraction);
+					app.get('/room/delete', onDelete)
 				})
 			});
 
@@ -263,12 +264,19 @@ module.exports = function (options) {
 				}
 			}, function (room, next) {
 				seneca.act({role:'prop',cmd:'listInteraction',data:{room:req.query.id}}, function (err, interactions){
+					console.log(interactions);
 					room.interactions = interactions;
 					next(err, room);
 				});
 			}
 		], function (err, result){
 			res.render('admin/room/interaction', { room : result });
+		});
+	}
+
+	function onDelete(req, res){
+		seneca.act({role:'room',cmd:'delete',data:{id:req.query.id}}, function (err, result){
+			res.redirect('/room/list');
 		});
 	}
 
