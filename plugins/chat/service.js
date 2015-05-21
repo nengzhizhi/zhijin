@@ -25,7 +25,7 @@ module.exports = function(options) {
 
 			socket.on('message', function (data) {
 				console.log(data);
-				rooms[roomId].emit('message', 'some message');
+				rooms[roomId].emit('message', { msg : data.msg });
 			});
 
 			socket.on('disconnect', function(){

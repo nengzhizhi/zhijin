@@ -21,6 +21,13 @@ $(function () {
 
 	 var socket = io("http://localhost:3003/chat/" + defaultRoomId);
 	 socket.on('new connection', function (data){
-	 	$('#connecting').html("连接成功！" + data.token);
+	 	$('#status').html("连接成功！" + data.token);
+	 });
+	 socket.on('message', function (data){
+	 	$('#box').append('<div><code>' + data.msg + '</code></div>');
+	 });
+
+	 $('#send').click(function(){
+	 	socket.emit('message',{ msg : $('#message').val() })
 	 });
 })

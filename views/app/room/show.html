@@ -10,14 +10,33 @@
 		<div class="container">
 			<div class="row">
 				<h2 class="page-header">获取基本信息：</h2>
-				<table class="table">
-					<tr>
-						<th>房间名称：</th><td id="roomName"></td>
-					</tr>
-				</table>
-
+				<pre>
+					<table class="table">
+						<tr>
+							<th>房间名称：</th><td id="roomName"></td>
+						</tr>
+					</table>
+				</pre>
 				<h2 class="page-header">初始化聊天室：</h2>
-				<span id="connecting">正在连接聊天室</span>
+				<!--
+				<pre>
+					<span id="connecting">正在连接聊天室</span>
+				</pre>
+				-->
+				<form class="form-inline">
+					<div class="form-group">
+						<input type="text" id="message" placeholder="输入聊天信息" class="form-control">
+					</div>
+					<div class="form-group">
+						<a onclick="javascript:void(0)" class="btn btn-default" id="send">发送消息</a>
+					</div>
+				</form>
+				<div class="panel panel-default">
+					<div class="panel-heading">聊天信息</div>
+					<div class="panel-body" id="box">
+						<span id="status">正在连接聊天室</span>
+					</div>
+				</div>		
 			</div>
 		</div>
 	</body>
