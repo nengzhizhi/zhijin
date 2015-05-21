@@ -4,7 +4,7 @@ var fields = forms.fields;
 var validators = forms.validators;
 var widgets = forms.widgets;
 var common = require('../common/index.js');
-var error = require('./roomError.js');
+var error = require('./roomError.js')();
 
 
 module.exports = function (options) {
@@ -127,6 +127,15 @@ module.exports = function (options) {
 					label: '房间名称：',
 					value: result.room.name
 				}),
+				'status': fields.string({
+					widget: widgets.select(),
+					label: '播放状态：',
+					choices: {
+						'waiting' : '暂停播放',
+						'playing' : '播放中'
+					},
+					value : result.room.status
+				}),
 				'type': fields.string({
 					label: '房间类型：',
 					widget: widgets.select(),
@@ -153,7 +162,13 @@ module.exports = function (options) {
 				})		
 			});
 
-			res.render('admin/room/edit', { editForm : seneca.editForm.toHTML(common.bootstrapField) });
+			res.render(
+				'admin/room/edit', 
+				{ 
+					editForm : seneca.editForm.toHTML(common.bootstrapField),
+					room : result.room
+				}
+			);
 		});
 	}
 
@@ -214,17 +229,20 @@ module.exports = function (options) {
 					}
 				}, function (form, next) {
 					seneca.act({role:'room',cmd:'update',data:form.data}, function (err, entity){
-						next(err, entity);
+						next(err, form);
 					});
 				}
 			], function (err, result){
+				res.redirect('/room/detail?id=' + result.data.id);
+				/*
 				res.render(
-						'admin/room/create',
+						'admin/room/edit',
 						{
 							result : err ? {error:err.message} : {success:'更新成功！'},
-							createForm : result.toHTML ? result.toHTML(common.bootstrapField) : seneca.editForm.toHTML(common.bootstrapField)
+							editForm : result&&result.toHTML ? result.toHTML(common.bootstrapField) : seneca.editForm.toHTML(common.bootstrapField)
 						}
 					);
+				*/
 			});
 	}
 

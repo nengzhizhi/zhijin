@@ -7,17 +7,22 @@ td{
   text-align: right;
 }
 </style>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <h4 class="page-header">房间管理&nbsp;>&nbsp;房间列表&nbsp;>&nbsp;编辑房间详情</h4>
-          <div class="row placeholders">
-            <form method="post" action="/room/update" class="form-horizontal">
-              <%-editForm %>
-              <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-4">
-                  <button type="submit" class="form-control btn btn-success">保存</button>
-                </div>
-              </div>              
-            </form>     
-          </div>
-        </div>   
+<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+  <h4 class="page-header">
+    房间管理&nbsp;>&nbsp;
+    <a href="/room/list">房间列表</a>&nbsp;>&nbsp;
+    <a href="/room/detail?id=<%-room.id %>">房间详情</a>&nbsp;>&nbsp;
+    编辑房间
+  </h4>
+  <div class="row placeholders">
+    <form method="post" action="/room/update" class="form-horizontal">
+      <%-editForm %>
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-4">
+          <button type="submit" class="form-control btn btn-success">保存</button>
+        </div>
+      </div>              
+    </form>     
+  </div>
+</div>   
 <% include ../footer.html %>

@@ -4,11 +4,18 @@ var roomModel = require('./model.js').roomModel;
 module.exports = function (options) {
 	var seneca = this;
 
-	this.add({role:'room',cmd:'get'},		cmd_get);
-	this.add({role:'room',cmd:'list'},		cmd_list);
-	this.add({role:'room',cmd:'create'},	cmd_create);
-	this.add({role:'room',cmd:'update'},	cmd_update);
-	this.add({role:'room',cmd:'delete'},	cmd_delete);
+	seneca.add({role:'room',cmd:'init'},cmd_init);
+	seneca.add({role:'room',cmd:'get'},	cmd_get);
+	seneca.add({role:'room',cmd:'list'},cmd_list);
+	seneca.add({role:'room',cmd:'create'},cmd_create);
+	seneca.add({role:'room',cmd:'update'},cmd_update);
+	seneca.add({role:'room',cmd:'delete'},cmd_delete);
+
+
+	function cmd_init(args, callback){
+		var roomId = args.data.id;
+		var room = io.of('/chat/' + roomId);
+	}
 
 	function cmd_get(args, callback){
 		roomModel

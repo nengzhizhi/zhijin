@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<title>直播1.9</title>
+		<link rel="stylesheet" type="text/css" href="/css/app/normalize.css" />
+		<link rel="stylesheet" type="text/css" href="/css/app/style.css" />
+		<link rel="stylesheet" type="text/css" href="/css/app/standers.css" />
+		<link rel="stylesheet" type="text/css" href="/css/app/eleShifts.css" />
+		<link rel="stylesheet" type="text/css" href="/css/app/index.css" />
+		<link rel="stylesheet" type="text/css" href="/css/app/general.css" />
+		<link rel="stylesheet" type="text/css" href="/css/app/login.css" />
+		<link rel="stylesheet" type="text/css" href="/css/app/register.css" />
+		<link rel="stylesheet" type="text/css" href="/css/app/forgetPwd.css" />
+		<link rel="stylesheet" type="text/css" href="/css/app/perfect-scrollbar.min.css" />
+		<style type="text/css">
+			.nav1Icon1,
+			.miniLeftIcon1 {
+				background: url('/img/app/zbj.png') no-repeat -280px -170px;
+			}
+			.miniLeftIconSet ul li:nth-child(1) .miniLeftHighlighter {
+				display: block;
+			}
+			.miniLeftIconSet ul li:nth-child(1) {
+				background-color: #000000;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="leftScale" class="scaleSwitch"></div>
+		<div id="leftScaleReverse" class="scaleSwitch"></div>
+		<div id="rightScale" class="scaleSwitch"></div>
+		<div id="rightScaleReverse" class="scaleSwitch"></div>
+		<div class="loginArea">
+			<div id="login">
+				<div class="loginText1">登录</div>
+				<div class="registerText1">注册</div>
+				<div class="closeLogin"></div>
+				<hr class="loginLine1" />
+				<div class="loginSliderBar"></div>
+				<input type="text" name="" id="loginName" placeholder="邮箱" />
+				<input type="password" name="" id="loginPwd" placeholder="密码" />
+				<div id="remberMe" class="rembMeBox"></div>
+				<div class="rembMeText">记住我</div>
+				<div class="goForget">忘记密码</div>
+				<div class="loginHint">
+					<div class="loginHintIcon"></div>
+					<div class="loginHintText">错误！</div>
+				</div>
+				<div class="loginButton"></div>
+				<div class="goRegister">没有账号？<span>马上注册</span></div>
+				<div class="thirdPartyLogin">
+					<div class="thirdPartyWeibo">
+						<div class="thirdPartyText">
+							使用微博账号登录
+						</div>
+					</div>
+					<div class="thirdPartyQQ">
+						<div class="thirdPartyText">
+							使用QQ账号登录
+						</div>
+					</div>
+					<div class="thirdPartyWeixin">
+						<div class="thirdPartyText">
+							使用微信账号登录
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="registerArea">
+			<div id="register">
+				<div class="loginText2">登录</div>
+				<div class="registerText2">注册</div>
+				<div class="closeRegister"></div>
+				<hr class="registerLine" />
+				<div class="registerSliderBar"></div>
+				<input type="text" name="" id="registerName" placeholder="用户名" />
+				<div class="registerSex">
+					<div id="registerSexText">性别</div>
+					<div class="registerSexSelection">
+						<input type="radio" name="registerSex" id="registerSexMale" value="male" checked="true"/>男
+						<input type="radio" name="registerSex" id="registerSexFemale" value="female"/>女
+					</div>
+				</div>
+				<input type="password" name="registerPwd" id="registerPwd" placeholder="密码" />
+				<input type="password" name="registerPwd2" id="registerPwd2" placeholder="确认密码" />
+				<input type="text" name="registerEmail" id="registerEmail" placeholder="邮箱" />
+				<!--<input type="text" name="registerCode" id="registerCode" placeholder="验证码" />-->
+				<div class="registerRuleCb"></div>
+				<div class="registerRule">
+					同意<span>呼啦服务条款</span>
+				</div>
+				<div class="registerHint">
+					<div class="registerHintIcon"></div>
+					<div class="registerHintText">错误！</div>
+				</div>
+				<div class="registerButton"></div>
+				<div class="goRegister goLogin">已有账号？<span>马上登录</span></div>
+				<div class="thirdPartyLogin2">
+					<div class="thirdPartyWeibo">
+						<div class="thirdPartyText">
+							使用微博账号登录
+						</div>
+					</div>
+					<div class="thirdPartyQQ">
+						<div class="thirdPartyText">
+							使用QQ账号登录
+						</div>
+					</div>
+					<div class="thirdPartyWeixin">
+						<div class="thirdPartyText">
+							使用微信账号登录
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="forgetPwdArea">
+			<div id="forgetPwd">
+				<div class="forgetPwdText">忘记密码</div>
+				<div class="closeforgetPwd"></div>
+				<hr class="forgetPwdLine" />
+				<div class="forgetPwdSliderBar"></div>
+				<input type="text" id="forgetPwdEmail" placeholder="邮箱" />
+				<div class="forgetPwdCodeArea">
+					<input type="text" id="forgetPwdCode" placeholder="验证码" />
+					<div class="forgetPwdCodeSend">发送验证码</div>
+					<div class="forgetPwdCodeSend2">发送验证码</div>
+				</div>
+				<div class="forgetPwdHint">
+					<div class="forgetPwdHintIcon"></div>
+					<div class="forgetPwdHintText">错误！</div>
+				</div>
+				<div class="forgetPwdButton">下一步</div>
+				<div class="forgetPwdBack">返回</div>
+				<div class="thirdPartyLogin3">
+					<div class="thirdPartyWeibo"></div>
+					<div class="thirdPartyQQ"></div>
+					<div class="thirdPartyWeixin"></div>
+				</div>
+			</div>
+		</div>
+		<div id="left">
+			<div class="logo"></div>
+			<div class="logoDivid"></div>
+			<div class="navSub  navSelected">
+				<span class="navHighlight"></span>
+				<span class="nav1Icon nav1Icon1"></span>
+				<span class="nav1Name">正在直播</span>
+			</div>
+			<div class="navSub">
+				<span></span>
+				<span class="nav1Icon nav1Icon2"></span>
+				<span class="nav1Name">往期回顾</span>
+			</div>
+			<div class="navSub">
+				<span></span>
+				<span class="nav1Icon nav1Icon3"></span>
+				<span class="nav1Name">选手嘉宾</span>
+			</div>
+			<div class="navSub">
+				<span></span>
+				<span class="nav1Icon nav1Icon4"></span>
+				<span class="nav1Name">任务中心</span>
+			</div>
+			<div class="navSub">
+				<span></span>
+				<span class="nav1Icon nav1Icon5"></span>
+				<span class="nav1Name">充值中心</span>
+			</div>
+			<div class="appDownload">
+				<div class="appDownloadWrapper">
+					<div class="qrCode">
+						<div class="qrText">
+							扫描二维码
+							<br/> 下载呼啦手机客户端
+						</div>
+						<div class="qrImg"></div>
+					</div>
+					<div class="download1"></div>
+					<div class="download2"></div>
+					<hr>
+				</div>
+			</div>
+			<div class="navSub" id="personalCenter">
+				<div class="logoDivid"></div>
+				<span class="nav1Name addHeight"> 
+
+	        <div class="personalCenterLogin"></div> 
+
+	        <div class="personalCenterRegister"></div>
+
+        </span>
+			</div>
+		</div>
+
+		<div id="right">
+
+			<div id="actorStatus">
+				<div class="actorStatusTitleBar">
+					<div class="actorStatusSelector"></div>
+					<div class="hddj topRight addCheckedColorFont">互动道具</div>
+					<div class="xcrq topRight">现场人气</div>
+					<div class="xsjf topRight">选手积分</div>
+				</div>
+				<div class="actorLists">
+					<div class="aLists actorLists3">
+						<div class="actorLists3Wrapper"></div>
+					</div>
+					<div class="aLists actorLists1">
+						<div class="actorRank1 actorList">
+							<div class="actorListNameImg">
+								<div class="actorListImg">
+									<img src="/img/app/temp/1.png" />
+								</div>
+								<div class="actorListName"> 郭碧婷</div>
+							</div>
+							<div class="actorListScore addCheckedColorFont actorListScore1">0</div>
+						</div>
+						<div class="actorRank2 actorList">
+							<div class="actorListNameImg">
+								<div class="actorListImg">
+									<img src="/img/app/temp/2.png" />
+								</div>
+								<div class="actorListName"> 佟丽娅</div>
+							</div>
+							<div class="actorListScore addCheckedColorFont actorListScore2">0</div>
+						</div>
+						<div class="actorRank3 actorList">
+							<div class="actorListNameImg">
+								<div class="actorListImg">
+									<img src="/img/app/temp/3.png" />
+								</div>
+								<div class="actorListName"> 张歆艺</div>
+							</div>
+							<div class="actorListScore addCheckedColorFont actorListScore3">0</div>
+						</div>
+						<div class="actorRank4 actorList">
+							<div class="actorListNameImg">
+								<div class="actorListImg">
+									<img src="/img/app/temp/4.png" />
+								</div>
+								<div class="actorListName"> Angelababy</div>
+							</div>
+							<div class="actorListScore addCheckedColorFont actorListScore4">0</div>
+						</div>
+					</div>
+					<div class="aLists actorLists2">
+						<div class="actorRank1 actorList">
+							<div class="actorListNameImg">
+								<div class="actorListImg">
+									<img src="/img/app/temp/1.png" />
+								</div>
+								<div class="actorListName"> 郭碧婷</div>
+							</div>
+							<div class="actorListScore addCheckedColorFont actorListScore1">0</div>
+						</div>
+						<div class="actorRank2 actorList">
+							<div class="actorListNameImg">
+								<div class="actorListImg">
+									<img src="/img/app/temp/2.png" />
+								</div>
+								<div class="actorListName"> 佟丽娅</div>
+							</div>
+							<div class="actorListScore addCheckedColorFont actorListScore2">0</div>
+						</div>
+						<div class="actorRank3 actorList">
+							<div class="actorListNameImg">
+								<div class="actorListImg">
+									<img src="/img/app/temp/3.png" />
+								</div>
+								<div class="actorListName"> 张歆艺</div>
+							</div>
+							<div class="actorListScore addCheckedColorFont actorListScore3">0</div>
+						</div>
+						<div class="actorRank4 actorList">
+							<div class="actorListNameImg">
+								<div class="actorListImg">
+									<img src="/img/app/temp/4.png" />
+								</div>
+								<div class="actorListName"> Angelababy</div>
+							</div>
+							<div class="actorListScore addCheckedColorFont actorListScore4">0</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<div id="chatUpdate">
+				<div class="actorStatusToggle">
+					<div class="actorStatusToggleArrow actorStatusToggleArrow1"></div>
+				</div>
+				<div class="chatUpdateTitleBar">
+					<div class="titleBar3 addCheckedColorFont">互动聊天</div>
+					<div class="actorStatusSliderBar3 addCheckedColorBg"></div>
+					<div class="titleBar4">粉丝榜</div>
+					<div class="actorStatusSliderBar4"></div>
+				</div>
+			</div>
+			<div class="chatContent">
+				<div class="chatContentInner">
+					<div id="connectStatus">
+						<img src="/img/app/loading.gif"/>
+					</div>
+					<div class="chatContentContainer">
+					</div>
+				</div>
+			</div>
+			<div id="chat">
+				<div class="chatInputArea">
+					<div class="chatInputAreaInner">
+						<input type="text" placeholder="此处输入文字" />
+					</div>
+				</div>
+				<div class="chatBtns">
+					<div class="userGroup"></div>
+					<div class="userCountNum"></div>
+					<div class="sendBtn"></div>
+				</div>
+			</div>
+			<div id="fansList">
+				<div class="allFans">
+					<div class="allFans-list">
+						<div class="allFans-list-rank">
+							<div class="allFans-list-rank-inner"></div>
+						</div>
+						<div class="allFans-list-img">
+							<div class="allFans-list-img-inner">
+								<img src="/img/app/18.gif"/>
+							</div>
+						</div>
+						<div class="allFans-list-text">
+							<div class="allFans-list-name">Compromized WIFI</div>
+							<div class="allFans-list-bal">9999999G</div>
+						</div>
+					</div>
+					<div class="allFans-list">
+						<div class="allFans-list-rank">
+							<div class="allFans-list-rank-inner"></div>
+						</div>
+						<div class="allFans-list-img">
+							<div class="allFans-list-img-inner">
+								<img src="/img/app/18.gif"/>
+							</div>
+						</div>
+						<div class="allFans-list-text">
+							<div class="allFans-list-name">Compromized WIFI</div>
+							<div class="allFans-list-bal">9999999G</div>
+						</div>
+					</div>
+					<div class="allFans-list">
+						<div class="allFans-list-rank">
+							<div class="allFans-list-rank-inner"></div>
+						</div>
+						<div class="allFans-list-img">
+							<div class="allFans-list-img-inner">
+								<img src="/img/app/18.gif"/>
+							</div>
+						</div>
+						<div class="allFans-list-text">
+							<div class="allFans-list-name">Compromized WIFI</div>
+							<div class="allFans-list-bal">9999999G</div>
+						</div>
+					</div>
+				</div>
+				<div class="fansSelection">
+					<div class="fansToday"></div>
+					<div class="fansMonth"></div>
+					<div class="fansTotal"></div>
+				</div>
+			</div>
+		</div>
+
+		<div id="wrapper">
+			<div id="container">
+				<div id="switchTriggerLeft"></div>
+				<div id="switchTriggerRight"></div>
+				<div class="videoCell">
+					<div class="actorImg">
+						<img src="/img/app/temp/logo.jpg">
+					</div>
+					<div class="videoTitle">
+						<div class="videoTitleName">
+							互动节目名称
+							<p class="videoDate">第20141120期</p>
+						</div>
+						<div class="actorName">
+							本期选手：郭碧婷、 佟丽娅、 张歆艺、 Angelababy
+						</div>
+					</div>
+					<div class="videoViewport">
+						<div id="liveStreamVideo" style="position: relative;">
+							<div class="videoPlayer" id="videoPlayer"></div>
+							<div class="uiAlert balAlert">
+								<div class="balAlertText">
+									余额不足
+								</div>
+								<div class="alertBtn balAlertBtn1" data-type="topup"></div>
+								<div class="alertBtn balAlertBtn2" data-type="close"></div>
+							</div>
+							<div class="uiAlert msgAlert">
+								<div class="balAlertText">
+									请输入有效信息
+								</div>
+								<div class="alertBtn msgAlertBtn" data-type="close"></div>
+							</div>
+						</div>
+						<div class="videoFunction">
+							<span id="videoFuctionLeft">
+
+						<div class="userTask userTaskH"></div>
+
+						<div class="userTaskPanel"></div>
+
+						<div class="userTopup userTopupH"></div>
+
+						<div class="userBalance userBalanceH">
+
+							<span id="userBalanceText">余额：</span>
+							<span id="userBalanceAmount"></span>
+						</div>
+						</span>
+						<span id="videoFunctionRight">
+
+						<!--<span class="userTools userToolsH"></span>
+						<span class="userGift userGiftH"></span>-->
+						</span>
+						<div class="index-task-panel">
+							<div class="index-task-panel-wrapper">
+								<div class="index-task-top"></div>
+								<div class="index-task-title">点击查看更多任务</div>
+								<div class="index-task-blocks">
+									<div class="index-task-block">
+										<div class="index-task-block-border"></div>
+										<div class="index-task-block-sub">
+											<div class="index-task-block-sub-left">
+												<div class="index-task-block-money">
+													<div class="index-task-block-money-img">
+														<div class="index-task-block-money-img-src"></div>
+													</div>
+													<div class="index-task-block-earn-text">2000</div>
+												</div>
+											</div>
+											<div class="index-task-block-sub-right">
+												<div class="index-task-block-category">
+													<div class="index-task-block-category-img"></div>
+													<div class="index-task-block-category-text">观看这个激情大片儿</div>
+												</div>
+											</div>
+										</div>
+										<div class="index-task-block-sub">
+											<div class="index-task-block-sub-left"></div>
+											<div class="index-task-block-sub-right">
+												<div class="index-task-btn-times">
+													<span>0</span>/2
+												</div>
+												<div class="index-task-block-btn">观看</div>
+											</div>
+										</div>
+									</div>
+									<div class="index-task-block">
+										<div class="index-task-block-border"></div>
+										<div class="index-task-block-sub">
+											<div class="index-task-block-sub-left">
+												<div class="index-task-block-money">
+													<div class="index-task-block-money-img">
+														<div class="index-task-block-money-img-src"></div>
+													</div>
+													<div class="index-task-block-earn-text">2000</div>
+												</div>
+											</div>
+											<div class="index-task-block-sub-right">
+												<div class="index-task-block-category">
+													<div class="index-task-block-category-img"></div>
+													<div class="index-task-block-category-text">下载这个APP</div>
+												</div>
+											</div>
+										</div>
+										<div class="index-task-block-sub">
+											<div class="index-task-block-sub-left">
+												<div class="index-task-block-exp">
+													<div class="index-task-block-exp-img">Exp</div>
+													<div class="index-task-block-earn-text">1500</div>
+												</div>
+											</div>
+											<div class="index-task-block-sub-right">
+												<div class="index-task-block-btn">下载</div>
+											</div>
+										</div>
+									</div>
+									<div class="index-task-block">
+										<div class="index-task-block-border"></div>
+										<div class="index-task-block-sub">
+											<div class="index-task-block-sub-left">
+												<div class="index-task-block-exp">
+													<div class="index-task-block-exp-img">Exp</div>
+													<div class="index-task-block-earn-text">1500</div>
+												</div>
+											</div>
+											<div class="index-task-block-sub-right">
+												<div class="index-task-block-category">
+													<div class="index-task-block-category-text">设置头像</div>
+												</div>
+											</div>
+										</div>
+										<div class="index-task-block-sub">
+											<div class="index-task-block-sub-left"></div>
+											<div class="index-task-block-sub-right">
+												<div class="index-task-block-btn">设置</div>
+											</div>
+										</div>
+									</div>
+									<div class="index-task-block">
+										<div class="index-task-block-border"></div>
+										<div class="index-task-block-sub">
+											<div class="index-task-block-sub-left">
+												<div class="index-task-block-money">
+													<div class="index-task-block-money-img">
+														<div class="index-task-block-money-img-src"></div>
+													</div>
+													<div class="index-task-block-earn-text">2000</div>
+												</div>
+											</div>
+											<div class="index-task-block-sub-right">
+												<div class="index-task-block-category">
+													<div class="index-task-block-category-img"></div>
+													<div class="index-task-block-category-text">下载这个APP</div>
+												</div>
+											</div>
+										</div>
+										<div class="index-task-block-sub">
+											<div class="index-task-block-sub-left">
+												<div class="index-task-block-exp">
+													<div class="index-task-block-exp-img">Exp</div>
+													<div class="index-task-block-earn-text">1500</div>
+												</div>
+											</div>
+											<div class="index-task-block-sub-right">
+												<div class="index-task-block-btn">下载</div>
+											</div>
+										</div>
+									</div>
+									<div class="index-task-block">
+										<div class="index-task-block-border"></div>
+										<div class="index-task-block-sub">
+											<div class="index-task-block-sub-left">
+												<div class="index-task-block-money">
+													<div class="index-task-block-money-img">
+														<div class="index-task-block-money-img-src"></div>
+													</div>
+													<div class="index-task-block-earn-text">2000</div>
+												</div>
+											</div>
+											<div class="index-task-block-sub-right">
+												<div class="index-task-block-category">
+													<div class="index-task-block-category-img"></div>
+													<div class="index-task-block-category-text">下载这个APP</div>
+												</div>
+											</div>
+										</div>
+										<div class="index-task-block-sub">
+											<div class="index-task-block-sub-left">
+												<div class="index-task-block-exp">
+													<div class="index-task-block-exp-img">Exp</div>
+													<div class="index-task-block-earn-text">1500</div>
+												</div>
+											</div>
+											<div class="index-task-block-sub-right">
+												<div class="index-task-block-btn">下载</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="giftSys">
+					<div id="giftBar" class="giftBar">
+						<div class="giftBarBody clearfix">
+							<!--<div class="giftBarBubble"></div>-->
+							<div class="giftBarLeft">
+								<div class="giftBarLeftArrow"></div>
+							</div>
+							<div class="giftBarMiddle">
+								<div class="giftsWrapper">
+									<!--<div class="giftCards">
+	                    			<div class="giftCardsImgWrapper">
+	                    				<div class="giftCardsImg"></div>
+	                    			</div>
+	                    			<div class="giftCardsPrice">100G</div>
+	                    		</div>-->
+								</div>
+							</div>
+							<div class="giftBarRight">
+								<div class="giftBarRightArrow"></div>
+								<div class="giftBarRightBody">
+									<div class="giftBarRightSub1">
+										<div class="giftSendText1">送给</div>
+										<div class="giftSendOptions">
+											<div class="giftSendToList"></div>
+											<div class="giftDefaultText">选择赠送对象</div>
+											<div class="giftSendOptionsArrow"></div>
+										</div>
+									</div>
+									<div class="giftBarRightSub2">
+										<div class="giftSendText2">数量</div>
+										<div class="giftSendAmount">
+											<div class="giftAmount">
+												<input type="text" placeholder="数量" value="1" class="giftAmountInput" />
+											</div>
+											<div class="addAmount"></div>
+											<div class="giftBundle">
+												<ul>
+													<li class="giftBundle1" data-giftbundle="10">
+														<div>10</div>
+														<div>（十全十美）</div>
+													</li>
+													<li class="giftBundle1" data-giftbundle="66">
+														<div>66</div>
+														<div>（顺顺利利）</div>
+													</li>
+													<li class="giftBundle1" data-giftbundle="99">
+														<div>99</div>
+														<div>（长长久久）</div>
+													</li>
+													<li class="giftBundle1" data-giftbundle="188">
+														<div>188</div>
+														<div>（要抱抱）</div>
+													</li>
+													<li class="giftBundle1" data-giftbundle="520">
+														<div>520</div>
+														<div>（我爱你）</div>
+													</li>
+													<li class="giftBundle1" data-giftbundle="1314">
+														<div>1314</div>
+														<div>（一生一世）</div>
+													</li>
+												</ul>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="giftSendBtnEnable"></div>
+								<div class="giftSendBtnDisable"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="VideoShare" class="clearfix">
+					<div class="myOperations">
+						<div class="myNaming"></div>
+					</div>
+					<div class="myShares">
+						<div class="myshare myShareText">分享到：</div>
+						<div class="myshare weiboShare"></div>
+						<div class="myshare weixinShare"></div>
+						<div class="myshare qqZoneShare"></div>
+						<div class="myshare qqShare"></div>
+						<div class="myshare myShareMore"></div>
+						<div class="moreSharesWeixin">
+							<div class="moreSharesWeixinBubble"></div>
+							<div class="moreSharesWeixinBody"></div>
+						</div>
+						<div class="moreShares">
+							<div class="moreSharesLeft">
+								<div class="weixinShareText">
+									<img src="/img/app/weixinShareClicked.png" />
+
+									<p>扫微信二维码分享</p>
+								</div>
+								<div class="weixinShareQrCode"></div>
+							</div>
+							<div class="moreSharesRight">
+								<div class="moreSharesRow">
+									<div class="moreSharesRowCell">
+										<div class="moreSharesWeibo"></div>
+										<div class="moreSharesText" data-shareName="xlwb">新浪微博</div>
+									</div>
+									<div class="moreSharesRowCell">
+										<div class="moreSharesQQZone"></div>
+										<div class="moreSharesText" data-shareName="qqkj">QQ空间</div>
+									</div>
+									<div class="moreSharesRowCell">
+										<div class="moreSharesQQ"></div>
+										<div class="moreSharesText" data-shareName="qq">腾讯QQ</div>
+									</div>
+									<div class="moreSharesRowCell">
+										<div class="moreSharesRenRen"></div>
+										<div class="moreSharesText" data-shareName="rr">人人网</div>
+									</div>
+								</div>
+								<div class="moreSharesRow2">
+									<div class="moreSharesRowCell">
+										<div class="moreSharesTxWeibo"></div>
+										<div class="moreSharesText" data-shareName="txwb">腾讯微博</div>
+									</div>
+									<div class="moreSharesRowCell">
+										<div class="moreSharesTxFriend"></div>
+										<div class="moreSharesText" data-shareName="txpy">腾讯朋友</div>
+									</div>
+									<div class="moreSharesRowCell">
+										<div class="moreSharesBaiduTieba"></div>
+										<div class="moreSharesText" data-shareName="bdtb">百度贴吧</div>
+									</div>
+									<div class="moreSharesRowCell">
+										<div class="moreSharesDouban"></div>
+										<div class="moreSharesText" data-shareName="db">豆瓣</div>
+									</div>
+								</div>
+								<div class="moreSharesRow3">
+									<div class="moreSharesRowCell">
+										<div class="moreSharesTianya"></div>
+										<div class="moreSharesText" data-shareName="tysq">天涯社区</div>
+									</div>
+									<div class="moreSharesRowCell">
+										<div class="moreSharesKaixin"></div>
+										<div class="moreSharesText" data-shareName="kxw">开心网</div>
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<hr class="videoViewportLine" />
+				<div id="actorDetails">
+					<div class="actorDetailTitle">选手简介</div>
+					<div class="actorStage"></div>
+				</div>
+			</div>
+		</div>
+		</div>
+
+		<div id="miniLeft">
+			<div class="miniLogo"></div>
+			<hr/>
+			<div class="miniLeftIconSet">
+				<ul>
+					<li>
+						<div class="miniLeftIcon miniLeftIcon1"></div>
+						<div class="miniLeftHighlighter"></div>
+						<div class="miniLeftInfo miniLeftInfo">
+							<div class="miniLeftInfoArrow"></div>
+							<div class="miniLeftInfoText">正在直播</div>
+						</div>
+					</li>
+					<li>
+						<div class="miniLeftIcon miniLeftIcon2"></div>
+						<div class="miniLeftHighlighter"></div>
+						<div class="miniLeftInfo">
+							<div class="miniLeftInfoArrow"></div>
+							<div class="miniLeftInfoText">往期回顾</div>
+						</div>
+					</li>
+					<li>
+						<div class="miniLeftIcon miniLeftIcon3"></div>
+						<div class="miniLeftHighlighter"></div>
+						<div class="miniLeftInfo">
+							<div class="miniLeftInfoArrow"></div>
+							<div class="miniLeftInfoText">选手嘉宾</div>
+						</div>
+					</li>
+					<li>
+						<div class="miniLeftIcon miniLeftIcon4"></div>
+						<div class="miniLeftHighlighter"></div>
+						<div class="miniLeftInfo">
+							<div class="miniLeftInfoArrow"></div>
+							<div class="miniLeftInfoText">任务中心</div>
+						</div>
+					</li>
+					<li>
+						<div class="miniLeftIcon miniLeftIcon5"></div>
+						<div class="miniLeftHighlighter"></div>
+						<div class="miniLeftInfo">
+							<div class="miniLeftInfoArrow"></div>
+							<div class="miniLeftInfoText">充值中心</div>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<div class="miniLeftPersonal">
+				<div class="miniLeftPersonalLine"></div>
+				<div class="miniLeftPersonalWrapper">
+					<div class="miniPersonalIcon"></div>
+					<div class="miniLeftInfo miniLeftInfoPersonal">
+						<div class="miniLeftInfoArrow"></div>
+						<div class="miniLeftInfoText">登陆/注册</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="usersList">
+			<div class="usersListTitle">
+				用户列表
+				<div class="closeUsersList"></div>
+			</div>
+			<hr/>
+			<div class="usersListAdmin">
+				<div class="usersListAtitle">
+					管理(<span>1</span>人)
+				</div>
+				<div class="usersListAusers">
+					<div class="usersListAusersImg">
+						<img src="/img/app/123.jpg" />
+					</div>
+					<div class="usersListAusersName">FGFASD</div>
+					<div class="usersListAusersLvl">LV54</div>
+				</div>
+			</div>
+			<div class="usersListNdmin"></div>
+		</div>
+
+		<script src="/js/app/jquery-2.1.1.min.js"></script>
+        <script src="/js/app/init.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/js/app/script.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/js/app/cookie.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/js/app/swfobject.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/js/app/comm.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/js/app/locations.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/js/app/plugin.js" type="text/javascript" charset="utf-8"></script>
+		<script src="/js/app/perfect-scrollbar.min.js" type="text/javascript" charset="utf-8"></script>
+
+	</body>
+
+</html>

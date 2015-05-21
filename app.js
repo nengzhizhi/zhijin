@@ -1,29 +1,9 @@
-//var seneca = require('seneca')();
+var express = require('express');
+var ejs = require('ejs');
 
-/*
-seneca.use( 'mongo-store',
-		  {name:'seneca', host:'192.168.1.220', port: 27019}
-		);
-seneca.use('./plugins/room');
-
-seneca.ready(function(){
-		seneca.act({role:'room', cmd:'create', name:'test'}, function (err, result) {
-			console.log(result);
-		});
-	});
-*/
-
-/*
-seneca.use('./plugins/room/api');
-
-var app = require('express')();
-
-app
-	.use(seneca.export('web'))
-	.listen(3001);
-
-*/
-
-var app = require('express')();
+var app = express();
+app.engine('.html', ejs.__express);
+app.set('view engine', 'html');
+app.use(express.static(__dirname + '/public'));
 app.use('/room', require('./controllers/roomRouter'));
 app.listen(3000);
