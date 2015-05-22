@@ -1,18 +1,32 @@
+var async = require('async');
 var uuid = require('node-uuid');
+var error = require('./chatError.js');
 
 module.exports = function(options) {
 	var seneca = this;
 	var rooms = [];
 	
 	seneca.io = require('socket.io')();
-	seneca.io.listen(3003);
 
 	seneca.add({role:'chat',cmd:'init'},		cmd_init);
 	seneca.add({role:'chat',cmd:'create'},		cmd_create);
 	seneca.add({role:'chat',cmd:'broadcast'},	cmd_broadcast);
 
 	function cmd_init(args, callback){
-
+		seneca.act({role:'room',cmd:'list'}, function (err, rooms) {
+			async.each(
+					rooms, 
+					function (room, done) {
+						seneca.act({role:'chat',cmd:'create',data:{roomId:room._id}}, function (err, result) {
+							done(err);
+						});
+					},
+					function (err) {
+						seneca.io.listen(3003);
+						callback(err);
+					}
+				);
+		})
 	}
 
 	function cmd_create(args, callback){
@@ -32,13 +46,17 @@ module.exports = function(options) {
 				console.log('disconnect token = ' + token);
 			});
 		})
+
+		callback(null, rooms[roomId]);
 	}
 
 	function cmd_broadcast(args, callback){
+		console.log('broadcast :' + args);
 		var roomId = args.data.roomId;
-		var sendData = args.data.sendData;
+		var command = args.data.command;
+		var params = args.data.params;
 
-		rooms[roomId].emit('message', sendData);
+		rooms[roomId].emit(command, params);
 	}
 
 	/*

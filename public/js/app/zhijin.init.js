@@ -23,9 +23,17 @@ $(function () {
 	 socket.on('new connection', function (data){
 	 	$('#status').html("连接成功！" + data.token);
 	 });
+
+	 //接收聊天消息
 	 socket.on('message', function (data){
 	 	$('#box').append('<div><code>' + data.msg + '</code></div>');
 	 });
+
+	 //接收互动消息
+	 socket.on('interact', function (data){
+	 	console.log('interact:' + JSON.stringify(data));
+	 })
+
 
 	 $('#send').click(function(){
 	 	socket.emit('message',{ msg : $('#message').val() })

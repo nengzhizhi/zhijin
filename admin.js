@@ -11,10 +11,24 @@ seneca.use(
 	{name:'zhijin', host:'112.124.117.146', port: 27017, usename:'zhijin', password:'b933defa'}
 );
 
-seneca.use('/plugins/room/backend');
-seneca.use('/plugins/program/backend');
-seneca.use('/plugins/prop/backend');
-seneca.use('/plugins/actor/backend');
+var options = {
+	service : {
+		room : {
+			host : '127.0.0.1',
+			port : 1001 
+		},
+		chat : {
+			host : '127.0.0.1',
+			port : 1002
+		}
+	}
+}
+seneca.client({host:'127.0.0.1',port:1001,pin:{role:'room',cmd:'*'}})
+
+seneca.use('/plugins/room/backend', options);
+seneca.use('/plugins/program/backend', options);
+seneca.use('/plugins/prop/backend', options);
+seneca.use('/plugins/actor/backend', options);
 seneca.use('/plugins/common')
 
 var adminApp = require('express')();

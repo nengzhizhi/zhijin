@@ -10,19 +10,14 @@
 		<div class="container">
 			<div class="row">
 				<h2 class="page-header">获取基本信息：</h2>
-				<pre>
-					<table class="table">
-						<tr>
-							<th>房间名称：</th><td id="roomName"></td>
-						</tr>
-					</table>
-				</pre>
+				<div class="panel panel-default">
+					<div class="panel-heading">房间基本信息</div>
+					<div class="panel-body">
+						房间名字：<span id="roomName"></span>
+					</div>
+				</div>					
+
 				<h2 class="page-header">初始化聊天室：</h2>
-				<!--
-				<pre>
-					<span id="connecting">正在连接聊天室</span>
-				</pre>
-				-->
 				<form class="form-inline">
 					<div class="form-group">
 						<input type="text" id="message" placeholder="输入聊天信息" class="form-control">

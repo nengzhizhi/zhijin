@@ -4,8 +4,11 @@ var interactionModel = require('./model.js').interactionModel;
 
 module.exports = function (options) {
 	var seneca = this;
+
+	seneca.use('/plugins/chat/service');
+
 	//此数据需要共享
-	seneca.countdownHandle = [];	
+	seneca.countdownHandle = [];
 
 	seneca.add({role:'prop', cmd:'createProp'}, cmd_createProp);
 	seneca.add({role:'prop', cmd:'listProp'}, cmd_listProp);
@@ -109,6 +112,13 @@ module.exports = function (options) {
 						interaction.save();
 
 						console.log('interaction = ' + interaction + '\r\n');
+
+						seneca.act({role:'chat',cmd:'broadcast',data:{
+							command : 'interact',
+							params : {
+								interaction : interaction
+							}
+						}});
 					}, 1000);
 
 					interaction.save(function (err){

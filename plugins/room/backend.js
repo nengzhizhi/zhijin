@@ -12,7 +12,16 @@ module.exports = function (options) {
 	var router = this.export('web/httprouter');
 
 
-	seneca.use('/plugins/room/service');
+	//seneca.use('/plugins/room/service');
+	/*
+	seneca.client({
+		host : options.service.room.host,
+		port : options.service.room.port,
+		pin : {role:'room',cmd:'*'}
+	});
+	*/
+	//seneca.client({host:'127.0.0.1',port:1001,pin:{role:'room',cmd:'*'}})
+
 
 	seneca.act(
 			'role:web', 
